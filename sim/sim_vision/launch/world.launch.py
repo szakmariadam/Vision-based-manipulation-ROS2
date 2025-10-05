@@ -27,10 +27,10 @@ def generate_launch_description():
         description='Full path to world model file (.sdf) to load'
     )
 
-    '''sim_time_arg = DeclareLaunchArgument(
+    sim_time_arg = DeclareLaunchArgument(
         'use_sim_time', default_value='True',
         description='Flag to enable use_sim_time'
-    )'''
+    )
 
     # Launch Gazebo Harmonic (gz sim)
     start_gazebo = ExecuteProcess(
@@ -38,7 +38,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    '''gz_bridge_node = Node(
+    gz_bridge_node = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
@@ -49,11 +49,11 @@ def generate_launch_description():
         parameters=[
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
-    )'''
+    )
 
     return LaunchDescription([
         declare_world_arg,
-        #sim_time_arg,
+        sim_time_arg,
         start_gazebo,
-        #gz_bridge_node
+        gz_bridge_node
     ])
