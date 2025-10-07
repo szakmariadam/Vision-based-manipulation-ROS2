@@ -108,6 +108,35 @@
                 </sensor>
             </link>
         </model>
+
+        <include>
+            <name>tag0</name>
+            <static>true</static>
+            <pose>-0.3 -0.3 1.015 0 0 0</pose>
+            <uri>model://Apriltag41_12_00000</uri>
+        </include>
+
+        <include>
+            <name>tag1</name>
+            <static>true</static>
+            <pose>-0.3 0.3 1.015 0 0 0</pose>
+            <uri>model://Apriltag41_12_00001</uri>
+        </include>
+
+        <include>
+            <name>tag2</name>
+            <static>true</static>
+            <pose>0.3 0.3 1.015 0 0 0</pose>
+            <uri>model://Apriltag41_12_00002</uri>
+        </include>
+
+        <include>
+            <name>tag3</name>
+            <static>true</static>
+            <pose>0.3 -0.3 1.015 0 0 0</pose>
+            <uri>model://Apriltag41_12_00003</uri>
+        </include>
+
         <include>
             <name>Table</name>
             <static>false</static>
