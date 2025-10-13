@@ -61,7 +61,7 @@
             </link>
         </model>
         <model name="rgb_camera">
-            <pose>-0.60 0 1.63 0 0.97 0</pose>
+            <pose>-0.60 0 1.63 0 0.86 0</pose>
             <static>true</static>
             <link name="camera_link">
                 <visual name="camera_body_visual">
@@ -94,8 +94,8 @@
                     <camera>
                         <horizontal_fov>1.047</horizontal_fov>
                         <image>
-                            <width>640</width>
-                            <height>480</height>
+                            <width>1280</width>
+                            <height>720</height>
                             <format>R8G8B8</format>
                         </image>
                         <camera_info_topic>camera/camera_info</camera_info_topic>

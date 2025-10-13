@@ -34,7 +34,7 @@ def generate_launch_description():
 
     # Launch Gazebo Harmonic (gz sim)
     start_gazebo = ExecuteProcess(
-        cmd=['gz', 'sim', '-v', '4', LaunchConfiguration('world')],
+        cmd=['gz', 'sim', '-v', '4', '-r', LaunchConfiguration('world')],
         output='screen'
     )
 
