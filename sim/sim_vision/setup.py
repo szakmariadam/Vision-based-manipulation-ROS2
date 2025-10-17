@@ -34,6 +34,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'image_saver = sim_vision.image_saver:main'
         ],
     },
 )
