@@ -63,3 +63,9 @@ img = cv2.line(img, corner, tuple(imgpts[2]), (255, 0, 0), 3)  # Z - blue
 
 cv2.imshow("Image", img)
 cv2.waitKey(0)
+
+proj_points, _ = cv2.projectPoints(objpoints, rvec, tvec, K, dist)
+proj_points = proj_points.reshape(-1, 2)
+img_points = imgpoints.reshape(-1, 2)
+error = cv2.norm(imgpoints.astype(np.float32), proj_points.astype(np.float32), cv2.NORM_L2) / len(proj_points)
+print("Reprojection error (pixels):", error)
