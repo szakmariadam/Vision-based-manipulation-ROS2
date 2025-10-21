@@ -5,9 +5,7 @@ import cv2
 image_path = "calib_images/workspace.png"
 tagFamily = "tagStandard41h12"
 
-tagsize = 0.05
 square_size = 0.6
-tag_id = 0
 
 tagCorners = np.array([
     [-square_size/2, square_size/2, 0],
@@ -40,18 +38,18 @@ imgpoints = np.array(
         detection[2].center,
         detection[3].center,
         detection[0].center,
-        detection[1].center
+        detection[1].center,    
     ])
 
 objpoints = tagCorners
 
-retval, rvec, tvec = cv2.solvePnP(objpoints, imgpoints, K, dist, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, K, dist, flags=cv2.SOLVEPNP_IPPE_SQUARE)
 
 print("pose found:", retval)
 if retval:
-    print("pose found for", image_path, "tag:", detection[tag_id].tag_id)
-print(rvec.ravel())
-print(tvec.ravel())
+    print("pose found for", image_path)
+print(rvec_workspace.ravel())
+print(tvec_workspace.ravel())
 
 axis = np.float32([
     [0.02, 0, 0],   # X axis (red)
@@ -59,8 +57,24 @@ axis = np.float32([
     [0, 0, -0.02]   # Z axis (blue)
 ])
 
-proj_points, _ = cv2.projectPoints(objpoints, rvec, tvec, K, dist)
+proj_points, _ = cv2.projectPoints(objpoints, rvec_workspace, tvec_workspace, K, dist)
 proj_points = proj_points.reshape(-1, 2)
 img_points = imgpoints.reshape(-1, 2)
 error = cv2.norm(imgpoints.astype(np.float32), proj_points.astype(np.float32), cv2.NORM_L2) / len(proj_points)
 print("Reprojection error (pixels):", error)
+
+# Convert rvec to rotation matrix
+R_workspace2cam, _ = cv2.Rodrigues(rvec_workspace)
+
+# Invert the rotation
+R_cam2workspace = R_workspace2cam.T
+
+# Invert the translation
+tvec_cam = -R_cam2workspace @ tvec_workspace
+
+# Convert rotation matrix back to rvec
+rvec_cam, _ = cv2.Rodrigues(R_cam2workspace)
+
+print("Camera pose in board frame:")
+print("rvec_cam:", rvec_cam.ravel())
+print("tvec_cam:", tvec_cam.ravel())
