@@ -3,11 +3,11 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 import numpy as np
-import pandas
 from dt_apriltags import Detector
 import cv2
 import os
 from ament_index_python import get_package_share_directory
+from cv_bridge import CvBridge
 
 class ExtrinsicCalib(Node):
     def __init__(self):
@@ -28,6 +28,7 @@ class ExtrinsicCalib(Node):
 
         self.square_size = 0.6
 
+        self.bridge = CvBridge()
         self.frame = None
 
         self.tagCorners = np.array([
@@ -62,8 +63,7 @@ class ExtrinsicCalib(Node):
             img = cv2.imread(image)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         else:
-            img = cv2.imread(image)
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         return gray
     
@@ -107,19 +107,18 @@ class ExtrinsicCalib(Node):
         return rvec_cam, tvec_cam
     
     def timer_callback(self):
-        if self.frame:
-            rvecWorkspace, tvecWorkspace = self.workspacePose(self.frame)
-            revecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
+        rvecWorkspace, tvecWorkspace = self.workspacePose(self.frame)
+        revecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
 
-            self.get_logger().info("workspace pose found")
-            self.get_logger().info(rvecWorkspace.ravel())
-            self.get_logger().info(tvecWorkspace.ravel())
+        self.get_logger().info("workspace pose found")
+        self.get_logger().info(str(rvecWorkspace.ravel()))
+        self.get_logger().info(str(tvecWorkspace.ravel()))
 
-            self.get_logger().info("camera pose found")
-            self.get_logger().info(revecCam.ravel())
-            self.get_logger().info(tvecCam.ravel())
-        else:
-            self.get_logger().info("No image recieved")
+        self.get_logger().info("camera pose found")
+        self.get_logger().info(str(revecCam.ravel()))
+        self.get_logger().info(str(tvecCam.ravel()))
+
+        #self.get_logger().info("No image recieved")
 
     def imageCallback(self, msg):
         # Convert ROS Image message to OpenCV image
