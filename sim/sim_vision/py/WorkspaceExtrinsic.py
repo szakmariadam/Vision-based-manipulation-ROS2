@@ -31,9 +31,13 @@ class WorkspaceExtrinsic:
             debug=False,
         )
     
-    def readImageGray(Self, imagePath):
-        img = cv2.imread(imagePath)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    def readImageGray(Self, image):
+        if isinstance(image, str): #if image path
+            img = cv2.imread(image)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            img = cv2.imread(image)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         return gray
 
@@ -42,8 +46,8 @@ class WorkspaceExtrinsic:
 
         return detection
     
-    def workspacePose(self, imagePath):
-        gray = self.readImageGray(imagePath)
+    def workspacePose(self, image):
+        gray = self.readImageGray(image)
 
         detection = self.detectTags(gray)
 
