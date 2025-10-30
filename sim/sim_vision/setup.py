@@ -20,6 +20,7 @@ setup(
 
         #Install config files
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.npz')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -34,7 +35,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'image_saver = sim_vision.image_saver:main'
+            'image_saver = sim_vision.image_saver:main',
+            'extrinsic_calib = sim_vision.extrinsic_calib:main'
         ],
     },
 )
