@@ -1,28 +1,54 @@
 <?xml version="1.0"?>
 <robot name="simple_camera" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <!-- Camera link (physical body) -->
-    <link name="camera_link">
-        <visual>
-            <geometry>
-                <box size="0.05 0.05 0.05"/>
-            </geometry>
-            <material name="black">
-                <color rgba="0 0 0 1"/>
-            </material>
-        </visual>
+  <xacro:include filename="$(find sim_vision)/urdf/materials.xacro" />
 
-        <collision>
-            <geometry>
-                <box size="0.05 0.05 0.05"/>
-            </geometry>
-        </collision>
+  <link name="world"/>
 
-        <inertial>
-            <mass value="0.1"/>
-            <inertia ixx="0.0001" ixy="0" ixz="0"
-                    iyy="0.0001" iyz="0"
-                    izz="0.0001"/>
-        </inertial>
-    </link>
+  <joint type="fixed" name="camera_joint">
+    <origin xyz="-0.6 0 1.63" rpy="0 0.86 0"/>
+    <child link="camera_link"/>
+    <parent link="world"/>
+  </joint>
+
+  <link name='camera_link'>
+    <pose>0 0 0 0 0 0</pose>
+    <inertial>
+      <mass value="1.0e-03"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+
+    <visual name="camera_body_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size=".1 .05 .05"/>
+      </geometry>
+      <material name = "red">
+        <color rgba="0.8 0.0 0.0 1.0"/>
+      </material>
+    </visual>
+    <visual name="camera_lens_visual">
+      <origin xyz="0.06 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.015"/>
+      </geometry>
+      <material name = "blue">
+        <color rgba="0 0.0 0.8 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint type="fixed" name="camera_optical_joint">
+    <origin xyz="0 0 0" rpy="-1.5707 0 -1.5707"/>
+    <child link="camera_link_optical"/>
+    <parent link="camera_link"/>
+  </joint>
+
+  <link name="camera_link_optical">
+  </link>
 </robot>
