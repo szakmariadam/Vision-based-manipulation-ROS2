@@ -15,6 +15,12 @@ def generate_launch_description():
         'workspace_world.sdf'
     ])
 
+    camera_file = PathJoinSubstitution([
+        FindPackageShare('sim_vision'),
+        'urdf',
+        'camera.xacro'
+    ])
+
     rviz_launch_arg = DeclareLaunchArgument(
         'rviz', default_value='true',
         description='Open RViz'
@@ -73,6 +79,15 @@ def generate_launch_description():
         ]
     )
 
+    spawn_camera = Node(
+        package="ros_gz_sim",
+        executable="create",
+        arguments=[
+            "-name", "camera",
+            "-file", camera_file
+        ]
+    )
+
     return LaunchDescription([
         declare_world_arg,
         sim_time_arg,
@@ -80,5 +95,6 @@ def generate_launch_description():
         gz_bridge_node,
         rviz_launch_arg,
         rviz_config_arg,
-        rviz_node
+        rviz_node,
+        spawn_camera
     ])
