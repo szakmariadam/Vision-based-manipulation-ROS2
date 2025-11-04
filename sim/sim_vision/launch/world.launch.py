@@ -15,10 +15,10 @@ def generate_launch_description():
         'workspace_world.sdf'
     ])
 
-    camera_file = PathJoinSubstitution([
+    workspace_file = PathJoinSubstitution([
         FindPackageShare('sim_vision'),
         'urdf',
-        'camera.xacro'
+        'workspace.xacro'
     ])
 
     rviz_launch_arg = DeclareLaunchArgument(
@@ -66,11 +66,11 @@ def generate_launch_description():
         ]
     )
 
-    spawn_camera = Node(
+    spawn_workspace = Node(
         package="ros_gz_sim",
         executable="create",
         arguments=[
-            "-name", "camera",
+            "-name", "workspace",
             "-topic", "robot_description",
         ],
         output="screen",
@@ -98,7 +98,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[
-            {'robot_description': Command(['xacro', ' ', camera_file]),
+            {'robot_description': Command(['xacro', ' ', workspace_file]),
              'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
     )   
@@ -112,5 +112,5 @@ def generate_launch_description():
         rviz_config_arg,
         robot_state_publisher_node,
         rviz_node,
-        spawn_camera
+        spawn_workspace
     ])

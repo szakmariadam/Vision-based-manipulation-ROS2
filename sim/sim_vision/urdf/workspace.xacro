@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot name="simple_camera" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name="world"/>
+
+  <joint type="fixed" name="workspace_joint">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <child link="workspace_link"/>
+    <parent link="world"/>
+  </joint>
+
+  <link name='workspace_link'/>
+</robot>
