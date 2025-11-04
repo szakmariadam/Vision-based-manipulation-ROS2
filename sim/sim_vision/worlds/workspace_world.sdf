@@ -61,6 +61,55 @@
             </link>
         </model>
 
+        <model name="rgb_camera">
+            <pose>-0.60 0 1.63 0 0.86 0</pose>
+            <static>true</static>
+            <link name="camera_link">
+                <visual name="camera_body_visual">
+                    <geometry>
+                        <box>
+                            <size>0.1 0.05 0.05</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.1 0.1 0.8 1</ambient>
+                        <diffuse>0.2 0.2 0.8 1</diffuse>
+                    </material>
+                </visual>
+
+                <visual name="camera_lens_visual">
+                    <pose>0.06 0 0 0 0 0</pose>
+                    <geometry>
+                        <sphere>
+                            <radius>0.015</radius>
+                        </sphere>
+                    </geometry>
+                    <material>
+                        <ambient>0.05 0.05 0.05 1</ambient>
+                        <diffuse>0.1 0.1 0.1 1</diffuse>
+                        <specular>0.5 0.5 0.5 1</specular>
+                    </material>
+                </visual>
+
+                <sensor name="camera" type="camera">
+                    <camera>
+                        <horizontal_fov>1.047</horizontal_fov>
+                        <image>
+                            <width>1280</width>
+                            <height>720</height>
+                            <format>R8G8B8</format>
+                        </image>
+                        <camera_info_topic>camera/camera_info</camera_info_topic>
+                    </camera>
+                    <always_on>true</always_on>
+                    <update_rate>30</update_rate>
+                    <visualize>true</visualize>
+
+                    <topic>camera/image</topic>
+                </sensor>
+            </link>
+        </model>
+
         <include>
             <name>tag0</name>
             <static>true</static>
