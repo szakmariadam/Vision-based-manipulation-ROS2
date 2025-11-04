@@ -103,6 +103,12 @@ def generate_launch_description():
         ]
     )
 
+    camera_extrinsic = Node(
+        package="sim_vision",
+        executable="camera_extrinsic",
+        name= "camera_extrinsic",
+    )
+
     return LaunchDescription([
         declare_world_arg,
         sim_time_arg,
@@ -112,5 +118,6 @@ def generate_launch_description():
         rviz_config_arg,
         robot_state_publisher_node,
         rviz_node,
-        spawn_workspace
+        spawn_workspace,
+        camera_extrinsic
     ])
