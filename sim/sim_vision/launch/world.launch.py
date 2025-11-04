@@ -101,7 +101,7 @@ def generate_launch_description():
             {'robot_description': Command(['xacro', ' ', workspace_file]),
              'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
-    )   
+    )
 
     return LaunchDescription([
         declare_world_arg,

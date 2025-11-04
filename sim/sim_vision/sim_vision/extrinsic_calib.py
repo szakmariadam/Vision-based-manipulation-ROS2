@@ -8,6 +8,8 @@ import cv2
 import os
 from ament_index_python import get_package_share_directory
 from cv_bridge import CvBridge
+from geometry_msgs.msg import TransformStamped
+from tf2_ros import TransformBroadcaster
 
 class ExtrinsicCalib(Node):
     def __init__(self):
@@ -57,6 +59,8 @@ class ExtrinsicCalib(Node):
             decode_sharpening=0.25,
             debug=False,
         )
+
+        self.transformBroadcaster = TransformBroadcaster(self)
 
     def readImageGray(Self, image):
         if isinstance(image, str): #if image path
@@ -117,6 +121,22 @@ class ExtrinsicCalib(Node):
         self.get_logger().info("camera pose found")
         self.get_logger().info(str(revecCam.ravel()))
         self.get_logger().info(str(tvecCam.ravel()))
+
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "workspace_link"
+        t.child_frame_id = "camera_link"
+
+        t.transform.translation.x = float(tvecCam[0])
+        t.transform.translation.y = float(tvecCam[1])
+        t.transform.translation.z = float(tvecCam[2])
+
+        t.transform.rotation.x = float(revecCam[0])
+        t.transform.rotation.y = float(revecCam[1])
+        t.transform.rotation.z = float(revecCam[2])
+        #t.transform.rotation.w = 1.0
+
+        self.transformBroadcaster.sendTransform(t)
 
         #self.get_logger().info("No image recieved")
 
