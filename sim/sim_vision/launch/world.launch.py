@@ -56,7 +56,7 @@ def generate_launch_description():
     )
 
     # Launch rviz
-    '''rviz_node = Node(
+    rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         arguments=['-d', PathJoinSubstitution([get_package_share_directory('sim_vision'), 'rviz', LaunchConfiguration('rviz_config')])],
@@ -64,7 +64,7 @@ def generate_launch_description():
         parameters=[
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
-    )'''
+    )
 
     spawn_camera = Node(
         package="ros_gz_sim",
@@ -111,6 +111,6 @@ def generate_launch_description():
         rviz_launch_arg,
         rviz_config_arg,
         robot_state_publisher_node,
-        #rviz_node,
+        rviz_node,
         spawn_camera
     ])
