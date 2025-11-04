@@ -40,7 +40,7 @@ setup(
     entry_points={
         'console_scripts': [
             'image_saver = sim_vision.image_saver:main',
-            'extrinsic_calib = sim_vision.extrinsic_calib:main'
+            'camera_extrinsic = sim_vision.camera_extrinsic:main'
         ],
     },
 )

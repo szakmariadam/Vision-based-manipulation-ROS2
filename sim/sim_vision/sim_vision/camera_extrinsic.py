@@ -11,10 +11,9 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster
 
-class ExtrinsicCalib(Node):
+class CameraExtrinsic(Node):
     def __init__(self):
-        super().__init__("extrinsic_calib")
-        self.get_logger().info("ExtrinsicCalib has started!")
+        super().__init__("camera_extrinsic")
 
         self.subscription = self.create_subscription(
             Image,
@@ -32,6 +31,8 @@ class ExtrinsicCalib(Node):
 
         self.bridge = CvBridge()
         self.frame = None
+
+        self.imageRecieved = False
 
         self.tagCorners = np.array([
             [-self.square_size/2, self.square_size/2, 0],
@@ -81,6 +82,11 @@ class ExtrinsicCalib(Node):
 
         detection = self.detectTags(gray)
 
+        if len(detection) != 4:
+            self.get_logger().info("Cannot detect 4 tags!")
+            return "error", "error"
+
+
         imgpoints = np.array(
             [
                 detection[2].center,
@@ -111,16 +117,17 @@ class ExtrinsicCalib(Node):
         return rvec_cam, tvec_cam
     
     def timer_callback(self):
+        
+        if not self.imageRecieved:
+            self.get_logger().info("Waiting for image...")
+            return
+        self.imageRecieved = False
+
         rvecWorkspace, tvecWorkspace = self.workspacePose(self.frame)
-        revecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
+        if isinstance(rvecWorkspace, str): return
+        rvecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
 
-        self.get_logger().info("workspace pose found")
-        self.get_logger().info(str(rvecWorkspace.ravel()))
-        self.get_logger().info(str(tvecWorkspace.ravel()))
-
-        self.get_logger().info("camera pose found")
-        self.get_logger().info(str(revecCam.ravel()))
-        self.get_logger().info(str(tvecCam.ravel()))
+        self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
 
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
@@ -131,22 +138,20 @@ class ExtrinsicCalib(Node):
         t.transform.translation.y = float(tvecCam[1])
         t.transform.translation.z = float(tvecCam[2])
 
-        t.transform.rotation.x = float(revecCam[0])
-        t.transform.rotation.y = float(revecCam[1])
-        t.transform.rotation.z = float(revecCam[2])
-        #t.transform.rotation.w = 1.0
+        t.transform.rotation.x = float(rvecCam[0])
+        t.transform.rotation.y = float(rvecCam[1])
+        t.transform.rotation.z = float(rvecCam[2])
 
         self.transformBroadcaster.sendTransform(t)
-
-        #self.get_logger().info("No image recieved")
 
     def imageCallback(self, msg):
         # Convert ROS Image message to OpenCV image
         self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        self.imageRecieved = True
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ExtrinsicCalib()
+    node = CameraExtrinsic()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
