@@ -1,3 +1,12 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 138
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /MotionPlanning1/Planned Path1
+      Splitter Ratio: 0.5
+    Tree Height: 2082
 Visualization Manager:
   Class: ""
   Displays:
@@ -14,32 +23,9 @@ Visualization Manager:
     - Class: rviz_default_plugins/RobotModel
       Name: RobotModel
       Enabled: true
-      Description Source: "Robot Description"
-      Robot Description: robot_description
-    - Class: rviz_default_plugins/LaserScan
-      Name: LaserScan
-      Enabled: true
-      Topic: /scan
-      Color Transformer: Intensity
-      Size (Pixels): 3
-    - Class: rviz_default_plugins/PointCloud2
-      Name: PointCloud2
-      Enabled: false
-      Topic: /pointcloud
-      Size (Pixels): 3
+      Description Source: Topic
+      Description Topic: /robot_description
 
   Global Options:
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
-
-  Tools:
-    - Class: rviz_default_plugins/Interact
-    - Class: rviz_default_plugins/MoveCamera
-    - Class: rviz_default_plugins/Select
-
-  Views:
-    Current:
-      Class: rviz_default_plugins/Orbit
-      Distance: 5
-      Pitch: 0.5
-      Yaw: 0.8
