@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 import numpy as np
 from dt_apriltags import Detector
 import cv2
@@ -16,8 +16,8 @@ class CameraExtrinsic(Node):
         super().__init__("camera_extrinsic")
 
         self.subscription = self.create_subscription(
-            Image,
-            'camera/image',
+            CompressedImage,
+            'camera/image/compressed',
             self.imageCallback,
             10
         )
@@ -146,7 +146,7 @@ class CameraExtrinsic(Node):
 
     def imageCallback(self, msg):
         # Convert ROS Image message to OpenCV image
-        self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        self.frame = self.bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='bgr8')
         self.imageRecieved = True
 
 def main(args=None):

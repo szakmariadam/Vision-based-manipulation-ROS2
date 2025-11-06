@@ -92,6 +92,20 @@ def generate_launch_description():
         ]
     )
 
+    # Node to bridge camera topics
+    gz_image_bridge_node = Node(
+        package="ros_gz_image",
+        executable="image_bridge",
+        arguments=[
+            "/camera/image",
+        ],
+        output="screen",
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time'),
+             'camera.image.compressed.jpeg_quality': 75},
+        ],
+    )
+
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -119,5 +133,6 @@ def generate_launch_description():
         robot_state_publisher_node,
         rviz_node,
         spawn_workspace,
-        camera_extrinsic
+        camera_extrinsic,
+        gz_image_bridge_node
     ])
