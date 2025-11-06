@@ -10,13 +10,13 @@ from launch.conditions import IfCondition
 def generate_launch_description():
     # Path to your world file
     world_file = PathJoinSubstitution([
-        FindPackageShare('sim_vision'),
+        FindPackageShare('workspace_sim'),
         'worlds',
         'workspace_world.sdf'
     ])
 
     workspace_file = PathJoinSubstitution([
-        FindPackageShare('sim_vision'),
+        FindPackageShare('workspace_sim'),
         'urdf',
         'workspace.xacro'
     ])
@@ -32,7 +32,7 @@ def generate_launch_description():
     )
 
     gz_bridge_params_path = os.path.join(
-        get_package_share_directory('sim_vision'),
+        get_package_share_directory('workspace_sim'),
         'config',
         'gz_bridge.yaml'
     )
@@ -59,7 +59,7 @@ def generate_launch_description():
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
-        arguments=['-d', PathJoinSubstitution([get_package_share_directory('sim_vision'), 'rviz', LaunchConfiguration('rviz_config')])],
+        arguments=['-d', PathJoinSubstitution([get_package_share_directory('workspace_sim'), 'rviz', LaunchConfiguration('rviz_config')])],
         condition=IfCondition(LaunchConfiguration('rviz')),
         parameters=[
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
@@ -104,7 +104,7 @@ def generate_launch_description():
     )
 
     camera_extrinsic = Node(
-        package="sim_vision",
+        package="camera_vision_py",
         executable="camera_extrinsic",
         name= "camera_extrinsic",
     )

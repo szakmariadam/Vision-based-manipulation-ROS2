@@ -42,7 +42,7 @@ class CameraExtrinsic(Node):
         
         #load intrinsics
         intrinsics_path = os.path.join(
-                get_package_share_directory('sim_vision'),
+                get_package_share_directory('camera_vision_py'),
                 'config',
                 'camera_calib.npz'
             )

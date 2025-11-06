@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'sim_vision'
+package_name = 'camera_vision_py'
 
 setup(
     name=package_name,
@@ -12,25 +12,14 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        #Install launch files
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
 
-        #Install world files
-        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
-
-        #Install config files
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         (os.path.join('share', package_name, 'config'), glob('config/*.npz')),
-
-        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
-
-        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.xacro'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='adam',
     maintainer_email='Szakmari.adam@gmail.com',
-    description='Simulation for computer vision',
+    description='Computer vision',
     license='Apache-2.0',
     extras_require={
         'test': [
@@ -39,8 +28,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'image_saver = sim_vision.image_saver:main',
-            'camera_extrinsic = sim_vision.camera_extrinsic:main'
+            'image_saver = camera_vision_py.image_saver:main',
+            'camera_extrinsic = camera_vision_py.camera_extrinsic:main'
         ],
     },
 )
