@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="simple_camera" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="workspace" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <link name="world"/>
 
   <joint type="fixed" name="workspace_joint">
@@ -8,5 +8,33 @@
     <parent link="world"/>
   </joint>
 
-  <link name='workspace_link'/>
+  <link name='workspace_link'>
+    <inertial>
+      <mass value="1.0e-03"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+  </link>
+
+  <joint type="fixed" name="camera_joint">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <child link="camera_link"/>
+    <parent link="workspace_link"/>
+  </joint>
+
+  <link name='camera_link'>
+    <inertial>
+      <mass value="1.0e-03"/>
+      <origin xyz="-0.6 0 1.63" rpy="0 0.86 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+  </link>
 </robot>
