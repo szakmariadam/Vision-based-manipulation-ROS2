@@ -2,6 +2,7 @@ from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 import os
@@ -117,6 +118,11 @@ def generate_launch_description():
         ]
     )
 
+    joint_state_publisher_gui_node = Node(
+        package="joint_state_publisher_gui",
+        executable="joint_state_publisher_gui",
+    )
+
     camera_extrinsic = Node(
         package="camera_vision_py",
         executable="camera_extrinsic",
@@ -132,6 +138,7 @@ def generate_launch_description():
         rviz_config_arg,
         robot_state_publisher_node,
         rviz_node,
+        joint_state_publisher_gui_node,
         spawn_workspace,
         camera_extrinsic,
         gz_image_bridge_node
