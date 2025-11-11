@@ -19,7 +19,7 @@ def generate_launch_description():
     workspace_file = PathJoinSubstitution([
         FindPackageShare('workspace_sim'),
         'urdf',
-        'workspace.xacro'
+        'workspace.urdf.xacro'
     ])
 
     rviz_launch_arg = DeclareLaunchArgument(
