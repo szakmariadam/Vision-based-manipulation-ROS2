@@ -153,11 +153,13 @@ def launch_setup(context, *args, **kwargs):
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
-            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             '--ros-args', '-p',
-            f'config_file:={gz_bridge_params_path}',
+            f'config_file:={gz_bridge_params_path}'
         ],
         output="screen",
+        parameters=[
+            {"use_sim_time": True},
+        ]
     )
 
     # Node to bridge camera topics
@@ -173,6 +175,12 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    camera_extrinsic = Node(
+        package="camera_vision_py",
+        executable="camera_extrinsic",
+        name= "camera_extrinsic",
+    )
+
     nodes_to_start = [
         robot_state_publisher_node,
         joint_state_broadcaster_spawner,
@@ -182,7 +190,8 @@ def launch_setup(context, *args, **kwargs):
         gz_spawn_entity,
         gz_launch_description,
         gz_sim_bridge,
-        #gz_image_bridge_node,
+        gz_image_bridge_node,
+        camera_extrinsic,
     ]
 
     return nodes_to_start
