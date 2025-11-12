@@ -25,7 +25,7 @@
   <link name="world"/>
 
   <joint type="fixed" name="workspace_joint">
-    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <origin xyz="0 0 1" rpy="0 0 -1.5708"/>
     <child link="workspace_link"/>
     <parent link="world"/>
   </joint>
@@ -65,7 +65,7 @@
   <joint name="base_to_robot_mount" type="fixed">
     <parent link="workspace_link"/>
     <child link="robot_mount"/>
-    <origin xyz="0.5 0 0" rpy="0 0 ${pi}" />
+    <origin xyz="0 0.5 0" rpy="0 0 ${pi}" />
   </joint>
 
   <!-- arm -->
