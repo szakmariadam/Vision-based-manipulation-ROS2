@@ -89,6 +89,7 @@ def launch_setup(context, *args, **kwargs):
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        parameters=[{"use_sim_time": True}],
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -105,12 +106,14 @@ def launch_setup(context, *args, **kwargs):
         package="controller_manager",
         executable="spawner",
         arguments=[initial_joint_controller, "-c", "/controller_manager"],
+        parameters=[{"use_sim_time": True}],
         condition=IfCondition(activate_joint_controller),
     )
     initial_joint_controller_spawner_stopped = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[initial_joint_controller, "-c", "/controller_manager", "--stopped"],
+        parameters=[{"use_sim_time": True}],
         condition=UnlessCondition(activate_joint_controller),
     )
 

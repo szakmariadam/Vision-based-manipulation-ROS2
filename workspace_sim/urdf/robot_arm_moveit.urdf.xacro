@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <robot name="ur" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find workspace_sim)/urdf/robot_arm_moveit_macro.xacro"/>
+  <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+  <xacro:include filename="$(find ur_simulation_gz)/urdf/ur_gz.ros2_control.xacro" />
 
   <xacro:arg name="ur_type" default="ur5e"/>
 
@@ -16,11 +17,60 @@
   <xacro:arg name="safety_pos_margin" default="0.15"/>
   <xacro:arg name="safety_k_position" default="20"/>
 
+  <xacro:arg name="simulation_controllers" default="" />
+  <xacro:arg name="ros_namespace" default="" />
+
   <link name="world"/>
 
-  <xacro:robot_arm
-    parent="world"
-    ur_type="$(arg ur_type)"
+  <joint type="fixed" name="workspace_joint">
+    <origin xyz="0 0 1" rpy="0 0 -1.5708"/>
+    <child link="workspace_link"/>
+    <parent link="world"/>
+  </joint>
+
+  <link name='workspace_link'>
+    <inertial>
+      <mass value="1.0e-03"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+  </link>
+
+  <joint type="fixed" name="camera_joint">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <child link="camera_link"/>
+    <parent link="workspace_link"/>
+  </joint>
+
+  <link name='camera_link'>
+    <inertial>
+      <mass value="1.0e-03"/>
+      <origin xyz="-0.6 0 1.63" rpy="0 0.86 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+  </link>
+
+  <link name="robot_mount"/>
+
+  <joint name="base_to_robot_mount" type="fixed">
+    <parent link="workspace_link"/>
+    <child link="robot_mount"/>
+    <origin xyz="0 0.5 0" rpy="0 0 ${pi}" />
+  </joint>
+
+  <!-- arm -->
+  <xacro:ur_robot
+    name="ur"
+    tf_prefix="$(arg tf_prefix)"
+    parent="robot_mount"
     joint_limits_parameters_file="$(arg joint_limit_params)"
     kinematics_parameters_file="$(arg kinematics_params)"
     physical_parameters_file="$(arg physical_params)"
@@ -28,8 +78,8 @@
     safety_limits="$(arg safety_limits)"
     safety_pos_margin="$(arg safety_pos_margin)"
     safety_k_position="$(arg safety_k_position)"
+    force_abs_paths="true"
     >
-      <origin xyz="0 0 1" rpy="0 0 -1.5708"/>
-  </xacro:robot_arm>
-
+    <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
+  </xacro:ur_robot>
 </robot>
