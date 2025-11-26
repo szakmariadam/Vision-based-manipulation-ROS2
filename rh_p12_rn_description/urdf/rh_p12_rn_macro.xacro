@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example_robot">
+
+    <xacro:include filename="$(find rh_p12_rn_description)/urdf/materials.xacro"/>
+
+    <!-- Example macro for a simple link with configurable parameters -->
+    <xacro:macro name="rh_p12_rn" params="parent">
+
+        <joint name="world_fixed" type="fixed">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <parent link="${parent}"/>
+            <child link="rh_p12_rn_base"/>
+        </joint>
+
+        <link name="rh_p12_rn_base">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="file://$(find rh_p12_rn_description)/meshes/base.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+            </collision>
+
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="file://$(find rh_p12_rn_description)/meshes/base.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="grey"/>
+            </visual>
+
+            <inertial>
+                <origin xyz="0.000 0.000 0.032" rpy="0 0 0"/>
+                <mass value="0.236"/>
+                <!--<inertia ixx="0.00017" ixy="0.0" ixz="0.0" iyy="0.00011" iyz="0.0" izz="0.00017" />-->
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+            </inertial>
+        </link>
+
+        <!-- Joint -->
+        <!--joint name="rh_p12_rn" type="revolute">
+            <parent link="rh_p12_rn_base"/>
+            <origin xyz="0.0 0.008 0.048" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit velocity="6.5" effort="1000" lower="0.0" upper="1.1" />
+            <dynamics damping="0.7"/>
+        </joint-->
+    </xacro:macro>
+</robot>

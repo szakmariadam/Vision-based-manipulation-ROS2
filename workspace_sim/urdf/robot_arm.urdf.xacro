@@ -3,6 +3,7 @@
 
   <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
   <xacro:include filename="$(find ur_simulation_gz)/urdf/ur_gz.ros2_control.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_description)/urdf/rh_p12_rn_macro.xacro"/>
 
   <xacro:arg name="ur_type" default="ur5e"/>
 
@@ -82,6 +83,8 @@
     >
     <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:ur_robot>
+
+  <xacro:rh_p12_rn parent="$(arg tf_prefix)tool0"/>
 
   <gazebo reference="world">
   </gazebo>
