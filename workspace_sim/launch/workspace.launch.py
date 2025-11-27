@@ -252,7 +252,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "controllers_file",
             default_value=PathJoinSubstitution(
-                [FindPackageShare("ur_simulation_gz"), "config", "ur_controllers.yaml"]
+                [FindPackageShare("workspace_sim"), "config", "controllers.yaml"]
             ),
             description="Absolute path to YAML file with the controllers configuration.",
         )
