@@ -4,6 +4,7 @@
   <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
   <xacro:include filename="$(find rh_p12_rn_description)/urdf/rh_p12_rn_macro.xacro"/>
   <xacro:include filename="$(find ur_description)/urdf/inc/ur_joint_control.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_description)/urdf/joint_control.xacro" />
 
   <xacro:arg name="ur_type" default="ur5e"/>
 
@@ -107,7 +108,9 @@
       tf_prefix="$(arg tf_prefix)"
       initial_positions="${dict(shoulder_pan_joint=0.0,shoulder_lift_joint=-1.57,elbow_joint=0.0,wrist_1_joint=-1.57,wrist_2_joint=0.0,wrist_3_joint=0.0)}"
     />
-    
+
+    <xacro:rh_p12_rn_joint_control_description/>
+
   </ros2_control>
 
 </robot>

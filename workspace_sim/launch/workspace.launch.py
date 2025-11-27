@@ -105,7 +105,10 @@ def launch_setup(context, *args, **kwargs):
     initial_joint_controller_spawner_started = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[initial_joint_controller],
+        arguments=[
+            initial_joint_controller,
+            'gripper_controller',
+            ],
         parameters=[{"use_sim_time": True}],
         condition=IfCondition(activate_joint_controller),
     )
