@@ -46,17 +46,6 @@
             <dynamics damping="0.7"/>
         </joint>
 
-        <transmission name="tran_r1">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="rh_p12_rn">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="motor_r1">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
-
         <!-- rh_p12_rn_r1 -->
         <link name="rh_p12_rn_r1">
             <collision>
@@ -91,17 +80,6 @@
             <limit velocity="6.5" effort="1000" lower="0.0" upper="1.0" />
             <dynamics damping="0.7"/>
         </joint>
-
-        <transmission name="tran_r2">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="rh_r2">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="motor_r2">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
 
         <!-- rh_p12_rn_r2 -->
         <link name="rh_p12_rn_r2">
@@ -138,17 +116,6 @@
             <dynamics damping="0.7"/>
         </joint>
 
-        <transmission name="tran_l1">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="rh_l1">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="motor_l1">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
-
         <!-- rh_p12_rn_l1 -->
         <link name="rh_p12_rn_l1">
             <collision>
@@ -183,17 +150,6 @@
             <limit velocity="6.5" effort="1000" lower="0.0" upper="1.0" />
             <dynamics damping="0.7"/>
         </joint>
-
-        <transmission name="tran_l2">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="rh_l2">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="motor_l2">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
 
         <!-- rh_p12_rn_l2 -->
         <link name="rh_p12_rn_l2">
