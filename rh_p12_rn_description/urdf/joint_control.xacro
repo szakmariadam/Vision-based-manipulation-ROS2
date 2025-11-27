@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="rh_p12_rn_joint_control_description">
+
+	
+
+  </xacro:macro>
+</robot>
