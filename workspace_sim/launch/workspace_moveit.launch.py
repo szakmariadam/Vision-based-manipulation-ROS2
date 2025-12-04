@@ -77,7 +77,7 @@ def launch_setup(context, *args, **kwargs):
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster"],
         parameters=[{"use_sim_time": True}],
     )
 
@@ -85,7 +85,9 @@ def launch_setup(context, *args, **kwargs):
     initial_joint_controller_spawner_started = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[initial_joint_controller, "-c", "/controller_manager"],
+        arguments=[initial_joint_controller,
+                   'gripper_controller'
+                   ],
         parameters=[{"use_sim_time": True}],
         condition=IfCondition(activate_joint_controller),
     )
@@ -246,7 +248,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "controllers_file",
             default_value=PathJoinSubstitution(
-                [FindPackageShare("ur_simulation_gz"), "config", "ur_controllers.yaml"]
+                [FindPackageShare("workspace_sim"), "config", "position_controllers.yaml"]
             ),
             description="Absolute path to YAML file with the controllers configuration.",
         )
