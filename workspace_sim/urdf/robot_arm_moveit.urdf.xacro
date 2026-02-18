@@ -25,12 +25,20 @@
   <link name="world"/>
 
   <joint type="fixed" name="workspace_joint">
-    <origin xyz="0 0 1" rpy="0 0 -1.5708"/>
+    <origin xyz="0 0 1.015" rpy="0 0 -1.5708"/>
     <child link="workspace_link"/>
     <parent link="world"/>
   </joint>
 
   <link name='workspace_link'>
+
+    <collision>
+      <origin xyz="0 0 -0.015" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.8 1.5 0.03" />
+      </geometry>
+    </collision>
+
     <inertial>
       <mass value="1.0e-03"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
