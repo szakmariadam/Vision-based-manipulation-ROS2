@@ -3,7 +3,7 @@ from dt_apriltags import Detector
 import cv2
 import glob
 
-image_path = "calib_images/workspace.png"
+image_path = "camera_vision_py/calib_images/workspace.png"
 tagFamily = "tagStandard41h12"
 
 tagsize = 0.05
@@ -17,7 +17,7 @@ tagCorners = np.array([
     [-square_size/2, -square_size/2, 0]], dtype=np.float32)
 
 #load intrinsics
-data = np.load('config/camera_calib.npz')
+data = np.load('camera_vision_py/config/camera_calib.npz')
 K = data['camera_matrix']
 dist = data['dist_coeffs']
 

@@ -2,7 +2,7 @@ import numpy as np
 from dt_apriltags import Detector
 import cv2
 
-image_path = "calib_images/workspace.png"
+image_path = "camera_vision_py/calib_images/workspace_center.png"
 tagFamily = "tagStandard41h12"
 
 square_size = 0.6
@@ -14,7 +14,7 @@ tagCorners = np.array([
     [-square_size/2, -square_size/2, 0]], dtype=np.float32)
 
 #load intrinsics
-data = np.load('config/camera_calib.npz')
+data = np.load('camera_vision_py/config/camera_calib.npz')
 K = data['camera_matrix']
 dist = data['dist_coeffs']
 
@@ -78,3 +78,15 @@ rvec_cam, _ = cv2.Rodrigues(R_cam2workspace)
 print("Camera pose in board frame:")
 print("rvec_cam:", rvec_cam.ravel())
 print("tvec_cam:", tvec_cam.ravel())
+
+#visualization
+imgpts, _ = cv2.projectPoints(axis, rvec_workspace, tvec_workspace, K, dist)
+imgpts = np.int32(imgpts).reshape(-1, 2)
+center = (639,290)
+
+img = cv2.line(img, center, tuple(imgpts[0]), (0, 0, 255), 1)  # X - red
+img = cv2.line(img, center, tuple(imgpts[1]), (0, 255, 0), 1)  # Y - green
+img = cv2.line(img, center, tuple(imgpts[2]), (255, 0, 0), 1)  # Z - blue
+
+cv2.imshow("Image", img)
+cv2.waitKey(0)
