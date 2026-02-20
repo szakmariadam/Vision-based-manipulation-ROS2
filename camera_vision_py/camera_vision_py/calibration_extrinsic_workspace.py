@@ -6,12 +6,33 @@ image_path = "camera_vision_py/calib_images/workspace_center.png"
 tagFamily = "tagStandard41h12"
 
 square_size = 0.6
+tag_size = (0.05/9)*5.12
 
 tagCorners = np.array([
     [-square_size/2, square_size/2, 0],
+    [-square_size/2 - tag_size/2, square_size/2 - tag_size/2, 0],
+    [-square_size/2 + tag_size/2, square_size/2 - tag_size/2, 0],
+    [-square_size/2 + tag_size/2, square_size/2 + tag_size/2, 0],
+    [-square_size/2 - tag_size/2, square_size/2 + tag_size/2, 0],
+
     [square_size/2, square_size/2, 0],
+    [square_size/2 - tag_size/2, square_size/2 - tag_size/2, 0],
+    [square_size/2 + tag_size/2, square_size/2 - tag_size/2, 0],
+    [square_size/2 + tag_size/2, square_size/2 + tag_size/2, 0],
+    [square_size/2 - tag_size/2, square_size/2 + tag_size/2, 0],
+
     [square_size/2, -square_size/2, 0],
-    [-square_size/2, -square_size/2, 0]], dtype=np.float32)
+    [square_size/2 - tag_size/2, -square_size/2 - tag_size/2, 0],
+    [square_size/2 + tag_size/2, -square_size/2 - tag_size/2, 0],
+    [square_size/2 + tag_size/2, -square_size/2 + tag_size/2, 0],
+    [square_size/2 - tag_size/2, -square_size/2 + tag_size/2, 0],
+
+    [-square_size/2, -square_size/2, 0],
+    [-square_size/2 - tag_size/2, -square_size/2 - tag_size/2, 0],
+    [-square_size/2 + tag_size/2, -square_size/2 - tag_size/2, 0],
+    [-square_size/2 + tag_size/2, -square_size/2 + tag_size/2, 0],
+    [-square_size/2 - tag_size/2, -square_size/2 + tag_size/2, 0]
+        ], dtype=np.float32)
 
 #load intrinsics
 data = np.load('camera_vision_py/config/camera_calib.npz')
@@ -33,17 +54,36 @@ at_detector = Detector(
 
 detection = at_detector.detect(gray)
 
-imgpoints = np.array(
-    [
+imgpoints = np.array([
+
         detection[2].center,
+        detection[2].corners[0],
+        detection[2].corners[1],
+        detection[2].corners[2],
+        detection[2].corners[3],
+
         detection[3].center,
+        detection[3].corners[0],
+        detection[3].corners[1],
+        detection[3].corners[2],
+        detection[3].corners[3],
+
         detection[0].center,
-        detection[1].center,    
+        detection[0].corners[0],
+        detection[0].corners[1],
+        detection[0].corners[2],
+        detection[0].corners[3],
+
+        detection[1].center,
+        detection[1].corners[0],
+        detection[1].corners[1],
+        detection[1].corners[2],
+        detection[1].corners[3],
     ])
 
 objpoints = tagCorners
 
-retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, K, dist, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, K, dist, flags=cv2.SOLVEPNP_IPPE)
 
 print("pose found:", retval)
 if retval:

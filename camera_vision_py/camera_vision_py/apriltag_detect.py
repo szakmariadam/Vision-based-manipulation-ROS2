@@ -1,7 +1,7 @@
 from dt_apriltags import Detector
 import cv2
 
-imgPath = "calib_images/workspace.png"
+imgPath = "camera_vision_py/calib_images/workspace.png"
 image = cv2.imread(imgPath, cv2.IMREAD_GRAYSCALE)
 image_color = cv2.imread(imgPath)
 
