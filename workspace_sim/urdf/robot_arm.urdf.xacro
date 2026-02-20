@@ -32,13 +32,6 @@
 
   <link name='workspace_link'>
 
-    <collision>
-      <origin xyz="0 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.8 1.5 0.03" />
-      </geometry>
-    </collision>
-
     <inertial>
       <mass value="1.0e-03"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
