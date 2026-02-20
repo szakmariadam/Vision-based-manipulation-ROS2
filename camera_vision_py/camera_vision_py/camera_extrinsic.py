@@ -28,6 +28,7 @@ class CameraExtrinsic(Node):
         self.tagFamily = "tagStandard41h12"
 
         self.square_size = 0.6
+        self.tag_size = (0.05/9)*5.12
 
         self.bridge = CvBridge()
         self.frame = None
@@ -36,9 +37,29 @@ class CameraExtrinsic(Node):
 
         self.tagCorners = np.array([
             [-self.square_size/2, self.square_size/2, 0],
+            [-self.square_size/2 - self.tag_size/2, self.square_size/2 - self.tag_size/2, 0],
+            [-self.square_size/2 + self.tag_size/2, self.square_size/2 - self.tag_size/2, 0],
+            [-self.square_size/2 + self.tag_size/2, self.square_size/2 + self.tag_size/2, 0],
+            [-self.square_size/2 - self.tag_size/2, self.square_size/2 + self.tag_size/2, 0],
+
             [self.square_size/2, self.square_size/2, 0],
+            [self.square_size/2 - self.tag_size/2, self.square_size/2 - self.tag_size/2, 0],
+            [self.square_size/2 + self.tag_size/2, self.square_size/2 - self.tag_size/2, 0],
+            [self.square_size/2 + self.tag_size/2, self.square_size/2 + self.tag_size/2, 0],
+            [self.square_size/2 - self.tag_size/2, self.square_size/2 + self.tag_size/2, 0],
+
             [self.square_size/2, -self.square_size/2, 0],
-            [-self.square_size/2, -self.square_size/2, 0]], dtype=np.float32)
+            [self.square_size/2 - self.tag_size/2, -self.square_size/2 - self.tag_size/2, 0],
+            [self.square_size/2 + self.tag_size/2, -self.square_size/2 - self.tag_size/2, 0],
+            [self.square_size/2 + self.tag_size/2, -self.square_size/2 + self.tag_size/2, 0],
+            [self.square_size/2 - self.tag_size/2, -self.square_size/2 + self.tag_size/2, 0],
+
+            [-self.square_size/2, -self.square_size/2, 0],
+            [-self.square_size/2 - self.tag_size/2, -self.square_size/2 - self.tag_size/2, 0],
+            [-self.square_size/2 + self.tag_size/2, -self.square_size/2 - self.tag_size/2, 0],
+            [-self.square_size/2 + self.tag_size/2, -self.square_size/2 + self.tag_size/2, 0],
+            [-self.square_size/2 - self.tag_size/2, -self.square_size/2 + self.tag_size/2, 0]
+                ], dtype=np.float32)
         
         #load intrinsics
         intrinsics_path = os.path.join(
@@ -87,17 +108,36 @@ class CameraExtrinsic(Node):
             return "error", "error"
 
 
-        imgpoints = np.array(
-            [
+        imgpoints = np.array([
+
                 detection[2].center,
+                detection[2].corners[0],
+                detection[2].corners[1],
+                detection[2].corners[2],
+                detection[2].corners[3],
+
                 detection[3].center,
+                detection[3].corners[0],
+                detection[3].corners[1],
+                detection[3].corners[2],
+                detection[3].corners[3],
+
                 detection[0].center,
-                detection[1].center,    
+                detection[0].corners[0],
+                detection[0].corners[1],
+                detection[0].corners[2],
+                detection[0].corners[3],
+
+                detection[1].center,
+                detection[1].corners[0],
+                detection[1].corners[1],
+                detection[1].corners[2],
+                detection[1].corners[3],
             ])
 
         objpoints = self.tagCorners
 
-        retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, self.K, self.dist, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, self.K, self.dist, flags=cv2.SOLVEPNP_IPPE)
 
         return rvec_workspace, tvec_workspace
 
