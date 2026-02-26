@@ -29,7 +29,8 @@ setup(
     entry_points={
         'console_scripts': [
             'image_saver = camera_vision_py.image_saver:main',
-            'camera_extrinsic = camera_vision_py.camera_extrinsic:main'
+            'camera_extrinsic = camera_vision_py.camera_extrinsic:main',
+            "ip_camera_publisher = camera_vision_py.ip_camera_publisher:main"
         ],
     },
 )
