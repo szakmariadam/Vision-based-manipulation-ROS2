@@ -104,7 +104,7 @@ class CameraExtrinsic(Node):
         detection = self.detectTags(gray)
 
         if len(detection) != 4:
-            self.get_logger().info("Cannot detect 4 tags!")
+            self.get_logger().error("Cannot detect 4 tags!")
             return "error", "error"
 
 
@@ -167,7 +167,7 @@ class CameraExtrinsic(Node):
         if isinstance(rvecWorkspace, str): return
         rvecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
 
-        self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
+        #self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
 
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
