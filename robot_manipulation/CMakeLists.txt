@@ -13,6 +13,7 @@ find_package(moveit_task_constructor_core REQUIRED)
 
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
+add_executable(pickplace_node src/pickplace_node.cpp)
 
 target_include_directories(move_to_pose PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -26,6 +27,12 @@ ament_target_dependencies(
 )
 
 ament_target_dependencies(
+  pickplace_node
+  "moveit_task_constructor_core"
+  "rclcpp"
+)
+
+ament_target_dependencies(
   mtc_node
   "moveit_task_constructor_core"
   "rclcpp"
@@ -34,6 +41,7 @@ ament_target_dependencies(
 install(TARGETS
   move_to_pose
   mtc_node
+  pickplace_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch
