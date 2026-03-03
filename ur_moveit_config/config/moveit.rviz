@@ -473,7 +473,7 @@ Visualization Manager:
         Voxel Rendering: Occupied Voxels
       Show Trail: false
       State Display Time: 0.05 s
-      Task Solution Topic: ""
+      Task Solution Topic: /solution
       Tasks:
         {}
       Trail Step Size: 1

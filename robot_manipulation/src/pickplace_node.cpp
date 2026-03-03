@@ -52,11 +52,67 @@ void MTCTaskNode::setupPlanningScene()
     object.primitives[0].dimensions = {0.05, 0.05, 0.05};
 
     geometry_msgs::msg::Pose pose;
+    pose.position.z = 0.025;
 
     object.pose = pose;
 
     moveit::planning_interface::PlanningSceneInterface psi;
     psi.applyCollisionObject(object);
+}
+
+void MTCTaskNode::doTask()
+{
+    task_ = createTask();
+
+    try
+    {
+        task_.init();
+    }
+    catch (mtc::InitStageException& e)
+    {
+        RCLCPP_ERROR_STREAM(LOGGER, e);
+        return;
+    }
+
+    if (!task_.plan(5))
+    {
+        RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
+        return;
+    }
+    task_.introspection().publishSolution(*task_.solutions().front());
+
+    auto result = task_.execute(*task_.solutions().front());
+    if (result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+    {
+        RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed");
+        return;
+    }
+    
+    return;
+}
+
+mtc::Task MTCTaskNode::createTask()
+{
+    mtc::Task task;
+    task.stages()->setName("pickplace");
+    task.loadRobotModel(node_);
+
+    const auto& arm_group_name = "ur_arm";
+    const auto& hand_group_name = "gripper";
+    const auto& hand_frame = "end_effector_link";
+
+    // Set task properties
+    task.setProperty("group", arm_group_name);
+    task.setProperty("eef", hand_group_name);
+    task.setProperty("ik_frame", hand_frame);
+
+    mtc::Stage* current_state_ptr = nullptr;  // Forward current_state on to grasp pose generator
+
+    auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
+    current_state_ptr = stage_state_current.get();
+    task.add(std::move(stage_state_current));
+
+    return task;
 }
 
 int main(int argc, char** argv)
@@ -76,6 +132,8 @@ int main(int argc, char** argv)
     });
 
     mtc_task_node->setupPlanningScene();
+
+    mtc_task_node->doTask();
 
     spin_thread->join();
     rclcpp::shutdown();
