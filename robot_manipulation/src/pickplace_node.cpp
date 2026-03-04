@@ -112,6 +112,19 @@ mtc::Task MTCTaskNode::createTask()
     current_state_ptr = stage_state_current.get();
     task.add(std::move(stage_state_current));
 
+    auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
+    auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
+
+    auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
+    cartesian_planner->setMaxVelocityScalingFactor(1.0);
+    cartesian_planner->setMaxAccelerationScalingFactor(1.0);
+    cartesian_planner->setStepSize(.01);
+
+    auto stage_open_hand = std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
+    stage_open_hand->setGroup(hand_group_name);
+    stage_open_hand->setGoal("Open");
+    task.add(std::move(stage_open_hand));
+
     return task;
 }
 
