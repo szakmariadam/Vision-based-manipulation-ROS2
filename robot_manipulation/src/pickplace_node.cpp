@@ -171,7 +171,7 @@ mtc::Task MTCTaskNode::createTask()
                                     Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()) *
                                     Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
             grasp_frame_transform.linear() = q.matrix();
-            grasp_frame_transform.translation().z() = 0.1;
+            grasp_frame_transform.translation().z() = 0;
 
             // Compute IK
             auto wrapper =
