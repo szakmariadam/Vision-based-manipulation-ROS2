@@ -184,6 +184,45 @@ mtc::Task MTCTaskNode::createTask()
             grasp->insert(std::move(wrapper));
         }
 
+        {
+            auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("allow collision (hand,object)");
+            stage->allowCollisions("cube",
+                                    task.getRobotModel()
+                                        ->getLinkModelNamesWithCollisionGeometry(),
+                                    true);
+            grasp->insert(std::move(stage));
+        }
+
+        {
+            auto stage = std::make_unique<mtc::stages::MoveTo>("close hand", interpolation_planner);
+            stage->setGroup(hand_group_name);
+            stage->setGoal("Close");
+            grasp->insert(std::move(stage));
+        }
+
+        {
+            auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("attach object");
+            stage->attachObject("cube", hand_frame);
+            attach_object_stage = stage.get();
+            grasp->insert(std::move(stage));
+        }
+
+        {
+            auto stage =
+                std::make_unique<mtc::stages::MoveRelative>("lift object", cartesian_planner);
+            stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
+            stage->setMinMaxDistance(0.1, 0.3);
+            stage->setIKFrame(hand_frame);
+            stage->properties().set("marker_ns", "lift_object");
+
+            // Set upward direction
+            geometry_msgs::msg::Vector3Stamped vec;
+            vec.header.frame_id = "world";
+            vec.vector.z = 1.0;
+            stage->setDirection(vec);
+            grasp->insert(std::move(stage));
+        }
+
         task.add(std::move(grasp));
     }
 
