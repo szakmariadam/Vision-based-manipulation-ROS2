@@ -270,35 +270,44 @@ mtc::Task MTCTaskNode::createTask()
         task.add(std::move(place));
     }
 
-    auto let_go_of_object = std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
-    let_go_of_object->setGroup(hand_group_name);
-    let_go_of_object->setGoal("Open");
-    task.add(std::move(let_go_of_object));
+    {
+        auto stage = std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
+        stage->setGroup(hand_group_name);
+        stage->setGoal("Open");
+        task.add(std::move(stage));
+    }
 
-    auto forbid_object_collision = std::make_unique<mtc::stages::ModifyPlanningScene>("forbid collision (hand,object)");
-      forbid_object_collision->allowCollisions("cube",
-                            task.getRobotModel()
-                                ->getJointModelGroup(hand_group_name)
-                                ->getLinkModelNamesWithCollisionGeometry(),
-                            false);
-    task.add(std::move(forbid_object_collision));
+    {
+        auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("forbid collision (hand,object)");
+        stage->allowCollisions("cube",
+                                task.getRobotModel()
+                                    ->getJointModelGroup(hand_group_name)
+                                    ->getLinkModelNamesWithCollisionGeometry(),
+                                false);
+        task.add(std::move(stage));
+    }
 
-    auto detach_object = std::make_unique<mtc::stages::ModifyPlanningScene>("detach object");
-    detach_object->detachObject("cube", hand_frame);
-    task.add(std::move(detach_object));
+    {
+        auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("detach object");
+        stage->detachObject("cube", hand_frame);
+        task.add(std::move(stage));
+    }
 
-    auto retreat = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
-    retreat->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-    retreat->setMinMaxDistance(0.1, 0.3);
-    retreat->setIKFrame(hand_frame);
-    retreat->properties().set("marker_ns", "retreat");
+    {
+        auto stage = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
+        stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
+        stage->setMinMaxDistance(0.1, 0.3);
+        stage->setIKFrame(hand_frame);
+        stage->properties().set("marker_ns", "retreat");
+    
 
-    // Set retreat direction
-    geometry_msgs::msg::Vector3Stamped vec;
-    vec.header.frame_id = "world";
-    vec.vector.z = 0.3;
-    retreat->setDirection(vec);
-    task.add(std::move(retreat));
+        // Set retreat direction
+        geometry_msgs::msg::Vector3Stamped vec;
+        vec.header.frame_id = "world";
+        vec.vector.z = 0.3;
+        stage->setDirection(vec);
+        task.add(std::move(stage));
+    }
 
     {
         auto stage = std::make_unique<mtc::stages::MoveTo>("return home", interpolation_planner);
