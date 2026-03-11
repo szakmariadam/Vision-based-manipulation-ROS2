@@ -128,7 +128,7 @@ mtc::Task MTCTaskNode::createTask()
     auto stage_move_to_pick = std::make_unique<mtc::stages::Connect>(
         "move to pick",
         mtc::stages::Connect::GroupPlannerVector{ { arm_group_name, sampling_planner } });
-    stage_move_to_pick->setTimeout(5.0);
+    stage_move_to_pick->setTimeout(1.0);
     stage_move_to_pick->properties().configureInitFrom(mtc::Stage::PARENT);
     task.add(std::move(stage_move_to_pick));
 
@@ -176,7 +176,7 @@ mtc::Task MTCTaskNode::createTask()
             // Compute IK
             auto wrapper =
                 std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
-            wrapper->setMaxIKSolutions(8);
+            wrapper->setMaxIKSolutions(2);
             wrapper->setMinSolutionDistance(1.0);
             wrapper->setIKFrame(grasp_frame_transform, hand_frame);
             wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
@@ -230,7 +230,7 @@ mtc::Task MTCTaskNode::createTask()
         auto stage_move_to_place = std::make_unique<mtc::stages::Connect>(
             "move to place",
             mtc::stages::Connect::GroupPlannerVector{ { arm_group_name, sampling_planner } });
-        stage_move_to_place->setTimeout(5.0);
+        stage_move_to_place->setTimeout(1.0);
         stage_move_to_place->properties().configureInitFrom(mtc::Stage::PARENT);
         task.add(std::move(stage_move_to_place));
     }
