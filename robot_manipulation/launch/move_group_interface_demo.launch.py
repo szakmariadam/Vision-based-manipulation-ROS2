@@ -5,6 +5,7 @@ from moveit_configs_utils import MoveItConfigsBuilder
 
 def generate_launch_description():
     moveit_config = MoveItConfigsBuilder("ur", package_name="ur_moveit_config").to_moveit_configs()
+    moveit_config.robot_description_kinematics["use_sim_time"] = True
 
     # MoveGroupInterface demo executable
     move_group_interface_demo = Node(

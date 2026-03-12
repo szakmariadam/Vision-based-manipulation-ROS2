@@ -11,6 +11,7 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
 find_package(graph_msgs REQUIRED)
+find_package(moveit_visual_tools REQUIRED)
 
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
@@ -33,6 +34,7 @@ ament_target_dependencies(
   "moveit_ros_planning_interface"
   "rclcpp"
   "graph_msgs"
+  "moveit_visual_tools"
 )
 
 ament_target_dependencies(
