@@ -10,10 +10,12 @@ find_package(ament_cmake REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
+find_package(graph_msgs REQUIRED)
 
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
 add_executable(pickplace_node src/pickplace_node.cpp)
+add_executable(move_group_interface_demo src/move_group_interface_demo.cpp)
 
 target_include_directories(move_to_pose PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -24,6 +26,13 @@ ament_target_dependencies(
   move_to_pose
   "moveit_ros_planning_interface"
   "rclcpp"
+)
+
+ament_target_dependencies(
+  move_group_interface_demo
+  "moveit_ros_planning_interface"
+  "rclcpp"
+  "graph_msgs"
 )
 
 ament_target_dependencies(
@@ -42,6 +51,7 @@ install(TARGETS
   move_to_pose
   mtc_node
   pickplace_node
+  move_group_interface_demo
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch
