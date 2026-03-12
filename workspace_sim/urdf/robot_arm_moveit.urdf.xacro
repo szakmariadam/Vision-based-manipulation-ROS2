@@ -10,7 +10,7 @@
 
   <!-- parameters -->
   <xacro:arg name="tf_prefix" default="" />
-  <xacro:arg name="joint_limit_params" default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml"/>
+  <xacro:arg name="joint_limit_params" default="$(find workspace_sim)/config/joint_limits.yaml"/>
   <xacro:arg name="kinematics_params" default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml"/>
   <xacro:arg name="physical_params" default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml"/>
   <xacro:arg name="visual_params" default="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml"/>
@@ -31,13 +31,6 @@
   </joint>
 
   <link name='workspace_link'>
-
-    <collision>
-      <origin xyz="0 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.8 1.5 0.03" />
-      </geometry>
-    </collision>
 
     <inertial>
       <mass value="1.0e-03"/>
@@ -122,5 +115,5 @@
                izz="1.0e-03" />
     </inertial>
   </link>
-
+  
 </robot>

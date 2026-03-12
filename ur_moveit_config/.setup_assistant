@@ -5,6 +5,21 @@ moveit_setup_assistant_config:
   srdf:
     relative_path: config/ur.srdf
   package_settings:
-    author_name: Szakmariadam
+    author_name: szakmariadam
     author_email: szakmari.adam@gmail.com
-    generated_timestamp: 1772039157
+    generated_timestamp: 1773309340
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
