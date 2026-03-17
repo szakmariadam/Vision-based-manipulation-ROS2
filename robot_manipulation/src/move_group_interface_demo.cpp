@@ -39,22 +39,22 @@ int main(int argc, char** argv)
   namespace rvt = rviz_visual_tools;
   moveit_visual_tools::MoveItVisualTools visual_tools(move_group_node, 
     "base_link", 
-    "move_group_interface_demo", 
+    "rviz_visual_tools", 
     move_group.getRobotModel());
 
-  //visual_tools.deleteAllMarkers();
+  visual_tools.deleteAllMarkers();
 
   /* Remote control is an introspection tool that allows users to step through a high level script */
   /* via buttons and keyboard shortcuts in RViz */
-  //visual_tools.loadRemoteControl();
+  visual_tools.loadRemoteControl();
 
   // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
-  //Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-  //text_pose.translation().z() = 1.0;
-  //visual_tools.publishText(text_pose, "MoveGroupInterface_Demo", rvt::WHITE, rvt::XLARGE);
+  Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+  text_pose.translation().z() = 1.0;
+  visual_tools.publishText(text_pose, "test", rvt::WHITE, rvt::XLARGE);
 
   // Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations
-  //visual_tools.trigger();
+  visual_tools.trigger();
 
   // Getting Basic Information
   // ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,5 +70,10 @@ int main(int argc, char** argv)
   std::copy(move_group.getJointModelGroupNames().begin(), move_group.getJointModelGroupNames().end(),
             std::ostream_iterator<std::string>(std::cout, ", "));
 
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
+
+
+  // Shutdown ROS
+  rclcpp::shutdown();  // <--- This will cause the spin function in the thread to return
   return 0;
 }
