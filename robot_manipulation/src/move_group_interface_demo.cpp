@@ -156,6 +156,46 @@ int main(int argc, char** argv)
   //move_group.move();
   //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
+  // Cartesian Paths
+  // ^^^^^^^^^^^^^^^
+  // You can plan a Cartesian path directly by specifying a list of waypoints
+  // for the end-effector to go through. The initial pose (start state) does not
+  // need to be added to the waypoint list but adding it can help with visualizations
+
+  auto current_pose = move_group.getCurrentPose().pose;
+
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  waypoints.push_back(current_pose);
+
+  auto cartesian_target_pose = current_pose;
+
+  cartesian_target_pose.position.z -= 0.2;
+  cartesian_target_pose.position.x -= 0.2;
+  waypoints.push_back(cartesian_target_pose);
+
+  cartesian_target_pose.position.z -= 0.2;
+  waypoints.push_back(cartesian_target_pose);
+
+  cartesian_target_pose.position.y -= 0.2;
+  waypoints.push_back(cartesian_target_pose);
+
+  // We want the Cartesian path to be interpolated at a resolution of 1 cm,
+  // which is why we will specify 0.01 as the max step in Cartesian translation.
+  const double eef_step = 0.01;
+  moveit_msgs::msg::RobotTrajectory trajectory;
+  double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
+  RCLCPP_INFO(LOGGER, "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0);
+
+  // Visualize the plan in RViz
+  visual_tools.deleteAllMarkers();
+  visual_tools.publishText(text_pose, "Cartesian_Path", rvt::WHITE, rvt::XLARGE);
+  visual_tools.publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
+  visual_tools.publishTrajectoryLine(trajectory, joint_model_group);
+  for (std::size_t i = 0; i < waypoints.size(); ++i)
+    visual_tools.publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
+  visual_tools.trigger();
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
   // Shutdown ROS
   rclcpp::shutdown();  // <--- This will cause the spin function in the thread to return
   return 0;
