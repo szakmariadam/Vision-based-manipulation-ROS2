@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   // ^^^^^^^^^^^^^
   namespace rvt = rviz_visual_tools;
   moveit_visual_tools::MoveItVisualTools visual_tools(move_group_node, 
-    "base_link", 
+    "world", 
     "rviz_visual_tools", 
     move_group.getRobotModel());
 
@@ -72,6 +72,37 @@ int main(int argc, char** argv)
 
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
 
+  // Planning to a Pose goal
+  // ^^^^^^^^^^^^^^^^^^^^^^^
+  // We can plan a motion for this group to a desired pose for the
+  // end-effector.
+  geometry_msgs::msg::Pose target_pose1;
+  target_pose1.orientation.w = 0;
+  target_pose1.position.x = 0;
+  target_pose1.position.y = 0;
+  target_pose1.position.z = 1.05;
+  target_pose1.orientation.x = 0.707;
+  target_pose1.orientation.y = 0.707;
+  move_group.setPoseTarget(target_pose1);
+
+  // Now, we call the planner to compute the plan and visualize it.
+  // Note that we are just planning, not asking move_group
+  // to actually move the robot.
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+  bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+
+  RCLCPP_INFO(LOGGER, "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+
+  // Visualizing plans
+  // ^^^^^^^^^^^^^^^^^
+  // We can also visualize the plan as a line with markers in RViz.
+  RCLCPP_INFO(LOGGER, "Visualizing plan 1 as trajectory line");
+  visual_tools.publishAxisLabeled(target_pose1, "pose1");
+  visual_tools.publishText(text_pose, "Pose_Goal", rvt::WHITE, rvt::XLARGE);
+  visual_tools.publishTrajectoryLine(my_plan.trajectory, joint_model_group);
+  visual_tools.trigger();
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
   // Shutdown ROS
   rclcpp::shutdown();  // <--- This will cause the spin function in the thread to return
