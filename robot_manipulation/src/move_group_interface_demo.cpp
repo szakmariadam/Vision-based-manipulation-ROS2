@@ -111,8 +111,8 @@ int main(int argc, char** argv)
   move_group.setMaxVelocityScalingFactor(1);
   move_group.setMaxAccelerationScalingFactor(1);
   
+  //This would actually move it
   //move_group.move();
-  //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
   // Planning to a joint-space goal
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -136,13 +136,6 @@ int main(int argc, char** argv)
     RCLCPP_WARN(LOGGER, "Target joint position(s) were outside of limits, but we will plan and clamp to the limits ");
   }
 
-  // We lower the allowed maximum velocity and acceleration to 5% of their maximum.
-  // The default values are 10% (0.1).
-  // Set your preferred defaults in the joint_limits.yaml file of your robot's moveit_config
-  // or set explicit factors in your code if you need your robot to move faster.
-  //move_group.setMaxVelocityScalingFactor(0.05);
-  //move_group.setMaxAccelerationScalingFactor(0.05);
-
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   RCLCPP_INFO(LOGGER, "Visualizing plan 2 (joint space goal) %s", success ? "" : "FAILED");
 
@@ -152,9 +145,6 @@ int main(int argc, char** argv)
   visual_tools.publishTrajectoryLine(my_plan.trajectory, joint_model_group);
   visual_tools.trigger();
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-
-  //move_group.move();
-  //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
   // Cartesian Paths
   // ^^^^^^^^^^^^^^^
@@ -196,10 +186,10 @@ int main(int argc, char** argv)
   visual_tools.trigger();
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
+  //This would move it
   //move_group.execute(trajectory);
-  //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
-// Adding objects to the environment
+  // Adding objects to the environment
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   //
   // First, let's plan to another simple goal with no objects in the way.
@@ -282,7 +272,6 @@ int main(int argc, char** argv)
   geometry_msgs::msg::Pose grab_pose;
   grab_pose.orientation.w = 0.7071;
   grab_pose.orientation.y = 0.7071;
-  //grab_pose.position.z = 1.05;
 
   // First, we add the object to the world (without using a vector).
   object_to_attach.primitives.push_back(cylinder_primitive);
@@ -343,7 +332,6 @@ int main(int argc, char** argv)
   /* Wait for MoveGroup to receive and process the attached collision object message */
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to once the collision object disappears");
 
-  // END_TUTORIAL
   visual_tools.deleteAllMarkers();
   visual_tools.trigger();
 
