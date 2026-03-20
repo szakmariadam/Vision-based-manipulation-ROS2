@@ -262,6 +262,91 @@ int main(int argc, char** argv)
   visual_tools.trigger();
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window once the plan is complete");
 
+  // Attaching objects to the robot
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  //
+  // You can attach an object to the robot, so that it moves with the robot geometry.
+  // This simulates picking up the object for the purpose of manipulating it.
+  // The motion planning should avoid collisions between objects as well.
+  moveit_msgs::msg::CollisionObject object_to_attach;
+  object_to_attach.id = "cylinder1";
+
+  shape_msgs::msg::SolidPrimitive cylinder_primitive;
+  cylinder_primitive.type = primitive.CYLINDER;
+  cylinder_primitive.dimensions.resize(2);
+  cylinder_primitive.dimensions[primitive.CYLINDER_HEIGHT] = 0.10;
+  cylinder_primitive.dimensions[primitive.CYLINDER_RADIUS] = 0.02;
+
+  // We define the frame/pose for this cylinder so that it appears in the gripper.
+  object_to_attach.header.frame_id = move_group.getEndEffectorLink();
+  geometry_msgs::msg::Pose grab_pose;
+  grab_pose.orientation.w = 0.7071;
+  grab_pose.orientation.y = 0.7071;
+  //grab_pose.position.z = 1.05;
+
+  // First, we add the object to the world (without using a vector).
+  object_to_attach.primitives.push_back(cylinder_primitive);
+  object_to_attach.primitive_poses.push_back(grab_pose);
+  object_to_attach.operation = object_to_attach.ADD;
+  planning_scene_interface.applyCollisionObject(object_to_attach);
+
+  // Then, we "attach" the object to the robot. It uses the frame_id to determine which robot link it is attached to.
+  // We also need to tell MoveIt that the object is allowed to be in collision with the finger links of the gripper.
+  // You could also use applyAttachedCollisionObject to attach an object to the robot directly.
+  RCLCPP_INFO(LOGGER, "Attach the object to the robot");
+  std::vector<std::string> touch_links;
+  touch_links.push_back("rh_p12_rn_l2");
+  touch_links.push_back("rh_p12_rn_r2");
+  move_group.attachObject(object_to_attach.id, "rh_p12_rn_base", touch_links);
+
+  visual_tools.publishText(text_pose, "Object_attached_to_robot", rvt::WHITE, rvt::XLARGE);
+  visual_tools.trigger();
+
+  /* Wait for MoveGroup to receive and process the attached collision object message */
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window once the new object is attached to the robot");
+
+  // Replan, but now with the object in hand.
+  move_group.setStartStateToCurrentState();
+  success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  RCLCPP_INFO(LOGGER, "Visualizing plan 7 (move around cuboid with cylinder) %s", success ? "" : "FAILED");
+  visual_tools.deleteAllMarkers();
+  visual_tools.publishTrajectoryLine(my_plan.trajectory, joint_model_group);
+  visual_tools.trigger();
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window once the plan is complete");
+
+  // Detaching and Removing Objects
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  //
+  // Now, let's detach the cylinder from the robot's gripper.
+  RCLCPP_INFO(LOGGER, "Detach the object from the robot");
+  move_group.detachObject(object_to_attach.id);
+
+  // Show text in RViz of status
+  visual_tools.deleteAllMarkers();
+  visual_tools.publishText(text_pose, "Object_detached_from_robot", rvt::WHITE, rvt::XLARGE);
+  visual_tools.trigger();
+
+  /* Wait for MoveGroup to receive and process the attached collision object message */
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window once the new object is detached from the robot");
+
+  // Now, let's remove the objects from the world.
+  RCLCPP_INFO(LOGGER, "Remove the objects from the world");
+  std::vector<std::string> object_ids;
+  object_ids.push_back(collision_object.id);
+  object_ids.push_back(object_to_attach.id);
+  planning_scene_interface.removeCollisionObjects(object_ids);
+
+  // Show text in RViz of status
+  visual_tools.publishText(text_pose, "Objects_removed", rvt::WHITE, rvt::XLARGE);
+  visual_tools.trigger();
+
+  /* Wait for MoveGroup to receive and process the attached collision object message */
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to once the collision object disappears");
+
+  // END_TUTORIAL
+  visual_tools.deleteAllMarkers();
+  visual_tools.trigger();
+
   // Shutdown ROS
   rclcpp::shutdown();  // <--- This will cause the spin function in the thread to return
   return 0;
