@@ -64,6 +64,23 @@ int main(int argc, char** argv)
 
   planning_scene_interface.addCollisionObjects(collision_objects);
 
+  // Joint constraint ot prevent elbow flipping
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  moveit_msgs::msg::JointConstraint joint_constraint;
+
+  joint_constraint.joint_name = "elbow_joint";
+  joint_constraint.position = 0.0;
+
+  joint_constraint.tolerance_above = 0.2;
+  joint_constraint.tolerance_below = 1.5707;
+
+  joint_constraint.weight = 1.0;
+
+  moveit_msgs::msg::Constraints path_constraints;
+  path_constraints.joint_constraints.push_back(joint_constraint);
+
+  move_group_arm.setPathConstraints(path_constraints);
+
   // Go above the object
   // ^^^^^^^^^^^^^^^^^^^
   geometry_msgs::msg::Pose above_object;
@@ -84,6 +101,7 @@ int main(int argc, char** argv)
   
   move_group_arm.move();
 
+  move_group_arm.clearPathConstraints();
   // Approach object
   // ^^^^^^^^^^^^^^^
 
