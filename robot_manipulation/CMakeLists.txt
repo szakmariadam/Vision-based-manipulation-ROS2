@@ -17,6 +17,7 @@ add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
 add_executable(pickplace_node src/pickplace_node.cpp)
 add_executable(move_group_interface_demo src/move_group_interface_demo.cpp)
+add_executable(pickplace_node_mgi src/pickplace_node_mgi.cpp)
 
 target_include_directories(move_to_pose PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -31,6 +32,14 @@ ament_target_dependencies(
 
 ament_target_dependencies(
   move_group_interface_demo
+  "moveit_ros_planning_interface"
+  "rclcpp"
+  "graph_msgs"
+  "moveit_visual_tools"
+)
+
+ament_target_dependencies(
+  pickplace_node_mgi
   "moveit_ros_planning_interface"
   "rclcpp"
   "graph_msgs"
@@ -54,6 +63,7 @@ install(TARGETS
   mtc_node
   pickplace_node
   move_group_interface_demo
+  pickplace_node_mgi
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch
