@@ -82,6 +82,44 @@ int main(int argc, char** argv)
   planning_scene_diff_publisher->publish(planning_scene);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
+  /* First, define the REMOVE object message*/
+  moveit_msgs::msg::CollisionObject remove_object;
+  remove_object.id = "box";
+  remove_object.header.frame_id = "end_effector_link";
+  remove_object.operation = remove_object.REMOVE;
+
+  /* Carry out the REMOVE + ATTACH operation */
+  RCLCPP_INFO(LOGGER, "Attaching the object to the hand and removing it from the world.");
+  planning_scene.world.collision_objects.clear();
+  planning_scene.world.collision_objects.push_back(remove_object);
+  planning_scene.robot_state.attached_collision_objects.push_back(attached_object);
+  planning_scene.robot_state.is_diff = true;
+  planning_scene_diff_publisher->publish(planning_scene);
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
+  /* First, define the DETACH object message*/
+  moveit_msgs::msg::AttachedCollisionObject detach_object;
+  detach_object.object.id = "box";
+  detach_object.link_name = "end_effector_link";
+  detach_object.object.operation = attached_object.object.REMOVE;
+
+  /* Carry out the DETACH + ADD operation */
+  RCLCPP_INFO(LOGGER, "Detaching the object from the robot and returning it to the world.");
+  planning_scene.robot_state.attached_collision_objects.clear();
+  planning_scene.robot_state.attached_collision_objects.push_back(detach_object);
+  planning_scene.robot_state.is_diff = true;
+  planning_scene.world.collision_objects.clear();
+  planning_scene.world.collision_objects.push_back(attached_object.object);
+  planning_scene.is_diff = true;
+  planning_scene_diff_publisher->publish(planning_scene);
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
+  RCLCPP_INFO(LOGGER, "Removing the object from the world.");
+  planning_scene.robot_state.attached_collision_objects.clear();
+  planning_scene.world.collision_objects.clear();
+  planning_scene.world.collision_objects.push_back(remove_object);
+  planning_scene_diff_publisher->publish(planning_scene);
+
   rclcpp::shutdown();
   return 0;
 }
