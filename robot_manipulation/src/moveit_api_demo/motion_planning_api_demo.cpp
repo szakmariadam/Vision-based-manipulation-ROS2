@@ -179,6 +179,49 @@ int main(int argc, char** argv)
   /* We can also use visual_tools to wait for user input */
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
+  moveit::core::RobotState goal_state(robot_model);
+  std::vector<double> joint_values = { 0, -1.5707, 1.5707, -1.5707, 0, 0};
+  goal_state.setJointGroupPositions(joint_model_group, joint_values);
+  moveit_msgs::msg::Constraints joint_goal =
+      kinematic_constraints::constructGoalConstraints(goal_state, joint_model_group);
+  req.goal_constraints.clear();
+  req.goal_constraints.push_back(joint_goal);
+
+  /* Re-construct the planning context */
+  context = planner_instance->getPlanningContext(planning_scene, req, res.error_code);
+  /* Call the Planner */
+  context->solve(res);
+  /* Check that the planning was successful */
+  if (res.error_code.val != res.error_code.SUCCESS)
+  {
+    RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
+    return -1;
+  }
+  /* Visualize the trajectory */
+  res.getMessage(response);
+
+  display_trajectory.trajectory.clear();
+
+  display_trajectory.trajectory_start = response.trajectory_start;
+  display_trajectory.trajectory.push_back(response.trajectory);
+
+  /* Now you should see two planned trajectories in series*/
+  visual_tools.publishTrajectoryLine(display_trajectory.trajectory.back(), joint_model_group);
+  visual_tools.trigger();
+  display_publisher->publish(display_trajectory);
+
+  /* We will add more goals. But first, set the state in the planning
+    scene to the final state of the last plan */
+  robot_state->setJointGroupPositions(joint_model_group, response.trajectory.joint_trajectory.points.back().positions);
+  planning_scene->setCurrentState(*robot_state.get());
+
+  visual_tools.publishAxisLabeled(pose.pose, "goal_2");
+  visual_tools.publishText(text_pose, "Joint Space Goal (2)", rvt::WHITE, rvt::XLARGE);
+  visual_tools.trigger();
+
+  /* Wait for user input */
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
   rclcpp::shutdown();
   return 0;
 }
