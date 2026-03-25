@@ -71,7 +71,7 @@ int main(int argc, char** argv)
   joint_constraint.joint_name = "elbow_joint";
   joint_constraint.position = 0.0;
 
-  joint_constraint.tolerance_above = 0.2;
+  joint_constraint.tolerance_above = 0;
   joint_constraint.tolerance_below = 1.5707;
 
   joint_constraint.weight = 1.0;
