@@ -113,6 +113,9 @@ mtc::Task MTCTaskNode::createTask()
     task.add(std::move(stage_state_current));
 
     auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
+    sampling_planner->setMaxAccelerationScalingFactor(0.5);
+    sampling_planner->setMaxVelocityScalingFactor(0.5);
+
     auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
 
     auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
@@ -176,7 +179,7 @@ mtc::Task MTCTaskNode::createTask()
             // Compute IK
             auto wrapper =
                 std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
-            wrapper->setMaxIKSolutions(2);
+            wrapper->setMaxIKSolutions(1);
             wrapper->setMinSolutionDistance(1.0);
             wrapper->setIKFrame(grasp_frame_transform, hand_frame);
             wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
@@ -188,8 +191,10 @@ mtc::Task MTCTaskNode::createTask()
             auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("allow collision (hand,object)");
             stage->allowCollisions("cube",
                                     task.getRobotModel()
-                                        ->getLinkModelNamesWithCollisionGeometry(),
+                                        ->getJointModelGroup(hand_group_name)
+                                        ->getLinkModelNamesWithCollisionGeometry() ,
                                     true);
+            stage->allowCollisions("cube", "workspace_link", true);
             grasp->insert(std::move(stage));
         }
 
@@ -259,7 +264,7 @@ mtc::Task MTCTaskNode::createTask()
             // Compute IK
             auto wrapper =
                 std::make_unique<mtc::stages::ComputeIK>("place pose IK", std::move(stage));
-            wrapper->setMaxIKSolutions(2);
+            wrapper->setMaxIKSolutions(1);
             wrapper->setMinSolutionDistance(1.0);
             wrapper->setIKFrame("cube");
             wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
@@ -310,7 +315,7 @@ mtc::Task MTCTaskNode::createTask()
     }
     
     {
-        auto stage = std::make_unique<mtc::stages::MoveTo>("return home", interpolation_planner);
+        auto stage = std::make_unique<mtc::stages::MoveTo>("return home", sampling_planner);
         stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
         stage->setGoal("Home");
         task.add(std::move(stage));
