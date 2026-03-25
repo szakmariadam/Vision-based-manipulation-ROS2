@@ -11,6 +11,10 @@
 #include <moveit_msgs/msg/planning_scene.hpp>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
+#include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit_msgs/msg/robot_trajectory.hpp>
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_api_demo");
 
 int main(int argc, char** argv)
@@ -82,6 +86,7 @@ int main(int argc, char** argv)
   pose.pose.position.z = 1.05;
   pose.pose.orientation.x = 0.707;
   pose.pose.orientation.y = 0.707;
+    pose.pose.orientation.w = 0;
 
   // A tolerance of 0.01 m is specified in position
   // and 0.01 radians in orientation
@@ -130,6 +135,17 @@ int main(int argc, char** argv)
 
   /* Wait for user input */
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
+  moveit_msgs::msg::RobotTrajectory trajectory_msg;
+  res.trajectory->getRobotTrajectoryMsg(trajectory_msg);
+
+  trajectory_execution_manager::TrajectoryExecutionManagerPtr tem(
+      new trajectory_execution_manager::TrajectoryExecutionManager(
+          node, robot_model, psm->getStateMonitor()));
+
+  tem->push(trajectory_msg);
+  tem->execute();
+  tem->waitForExecution();
   
   rclcpp::shutdown();
   return 0;
