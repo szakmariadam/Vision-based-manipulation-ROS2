@@ -13,6 +13,8 @@
 
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("pickplace_node_mgi");
+
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
@@ -83,13 +85,16 @@ int main(int argc, char** argv)
 
   // Go above the object
   // ^^^^^^^^^^^^^^^^^^^
-  geometry_msgs::msg::Pose above_object;
-  above_object.orientation.w = 0;
-  above_object.position.x = 0;
-  above_object.position.y = 0;
-  above_object.position.z = 1.25;
+
+  //get object postion
+  auto object_poses = planning_scene_interface.getObjectPoses({"cube"});
+
+  geometry_msgs::msg::Pose above_object = object_poses["cube"];
+
+  above_object.position.z += 0.2;
   above_object.orientation.x = 0.707;
   above_object.orientation.y = 0.707;
+  above_object.orientation.w = 0;
   move_group_arm.setPoseTarget(above_object);
 
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
@@ -102,6 +107,7 @@ int main(int argc, char** argv)
   move_group_arm.move();
 
   move_group_arm.clearPathConstraints();
+
   // Approach object
   // ^^^^^^^^^^^^^^^
 

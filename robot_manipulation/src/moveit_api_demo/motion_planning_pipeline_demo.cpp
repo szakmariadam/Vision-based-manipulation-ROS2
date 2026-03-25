@@ -86,7 +86,7 @@ int main(int argc, char** argv)
   pose.pose.position.z = 1.05;
   pose.pose.orientation.x = 0.707;
   pose.pose.orientation.y = 0.707;
-    pose.pose.orientation.w = 0;
+  pose.pose.orientation.w = 0;
 
   // A tolerance of 0.01 m is specified in position
   // and 0.01 radians in orientation
@@ -135,6 +135,9 @@ int main(int argc, char** argv)
 
   /* Wait for user input */
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+
+  // Execute
+  // ^^^^^^^
 
   moveit_msgs::msg::RobotTrajectory trajectory_msg;
   res.trajectory->getRobotTrajectoryMsg(trajectory_msg);
