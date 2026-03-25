@@ -39,12 +39,14 @@ int main(int argc, char** argv)
   psm->startWorldGeometryMonitor();
   psm->startStateMonitor();
 
+  psm->getStateMonitor()->waitForCurrentState(node->now());
+
   moveit::core::RobotModelPtr robot_model = robot_model_loader->getModel();
 
   moveit::core::RobotStatePtr robot_state(
       new moveit::core::RobotState(planning_scene_monitor::LockedPlanningSceneRO(psm)->getCurrentState()));
 
-  const moveit::core::JointModelGroup* joint_model_group = robot_state->getJointModelGroup("ur_arm");
+  const moveit::core::JointModelGroup* joint_model_group = robot_state->getJointModelGroup("gripper");
 
   planning_pipeline::PlanningPipelinePtr planning_pipeline(
       new planning_pipeline::PlanningPipeline(robot_model, node, "ompl"));
@@ -181,7 +183,66 @@ int main(int argc, char** argv)
   tem->push(trajectory_msg);
   tem->execute();
   tem->waitForExecution();
-  
+
+  // attach object
+  // ^^^^^^^^^^^^^
+ 
+  attached_object.link_name = "end_effector_link";
+  attached_object.touch_links = std::vector<std::string>{ "rh_p12_rn_l1", "rh_p12_rn_l2", "rh_p12_rn_r1", "rh_p12_rn_r2" };
+
+  /* First, define the REMOVE object message*/
+  moveit_msgs::msg::CollisionObject remove_object;
+  remove_object.id = "box";
+  remove_object.header.frame_id = "end_effector_link";
+  remove_object.operation = remove_object.REMOVE;
+
+  /* Carry out the REMOVE + ATTACH operation */
+  RCLCPP_INFO(LOGGER, "Attaching the object to the hand and removing it from the world.");
+  planning_scene.world.collision_objects.clear();
+  planning_scene.world.collision_objects.push_back(remove_object);
+  planning_scene.robot_state.attached_collision_objects.push_back(attached_object);
+  planning_scene.robot_state.is_diff = true;
+  planning_scene_diff_publisher->publish(planning_scene);
+
+  // close gripper
+  // ^^^^^^^^^^^^^
+
+  req.pipeline_id = "ompl";
+  req.planner_id = "RRTConnectkConfigDefault";
+  req.allowed_planning_time = 1.0;
+  req.max_velocity_scaling_factor = 1.0;
+  req.max_acceleration_scaling_factor = 1.0;
+
+  req.group_name = "gripper";
+
+  moveit::core::RobotState goal_state(*robot_state);
+  std::vector<double> joint_values = { 0.6981, 0.6981, 0.6981, 0.6981 };
+  goal_state.setJointGroupPositions(joint_model_group, joint_values);
+  moveit_msgs::msg::Constraints joint_goal =
+      kinematic_constraints::constructGoalConstraints(goal_state, joint_model_group);
+
+  req.goal_constraints.clear();
+  req.goal_constraints.push_back(joint_goal);
+
+  {
+    planning_scene_monitor::LockedPlanningSceneRO lscene(psm);
+    /* Now, call the pipeline and check whether planning was successful. */
+    /* Check that the planning was successful */
+    if (!planning_pipeline->generatePlan(lscene, req, res) || res.error_code.val != res.error_code.SUCCESS)
+    {
+      RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
+      rclcpp::shutdown();
+      return -1;
+    }
+  }
+
+  //execute
+  res.trajectory->getRobotTrajectoryMsg(trajectory_msg);
+
+  tem->push(trajectory_msg);
+  tem->execute();
+  tem->waitForExecution();
+
   rclcpp::shutdown();
   return 0;
 }
