@@ -47,33 +47,51 @@ int main(int argc, char** argv)
   planning_pipeline::PlanningPipelinePtr planning_pipeline(
       new planning_pipeline::PlanningPipeline(robot_model, node, "ompl"));
 
-  // Visualization
-  // ^^^^^^^^^^^^^
-  // The package MoveItVisualTools provides many capabilities for visualizing objects, robots,
-  // and trajectories in RViz as well as debugging tools such as step-by-step introspection of a script.
-  namespace rvt = rviz_visual_tools;
-  moveit_visual_tools::MoveItVisualTools visual_tools(node, "world", "rviz_visual_tools", psm);
-  visual_tools.deleteAllMarkers();
-
-  /* Remote control is an introspection tool that allows users to step through a high level script
-     via buttons and keyboard shortcuts in RViz */
-  visual_tools.loadRemoteControl();
-
-  // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
-  Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-  text_pose.translation().z() = 1.0;
-  visual_tools.publishText(text_pose, "motion_planning_pipeline_demo", rvt::WHITE, rvt::XLARGE);
-
-  /* Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations */
-  visual_tools.trigger();
-
   /* We can also use visual_tools to wait for user input */
-  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
+  rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
-  // Pose Goal
-  // ^^^^^^^^^
-  // We will now create a motion plan request for the right arm of the Panda
-  // specifying the desired pose of the end-effector as input.
+  rclcpp::Publisher<moveit_msgs::msg::PlanningScene>::SharedPtr planning_scene_diff_publisher =
+      node->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", 1);
+  while (planning_scene_diff_publisher->get_subscription_count() < 1)
+  {
+    rclcpp::sleep_for(std::chrono::milliseconds(500));
+  }
+
+  // Add object
+  // ^^^^^^^^^^
+
+  moveit_msgs::msg::AttachedCollisionObject attached_object;
+  /* The header must contain a valid TF frame*/
+  attached_object.object.header.frame_id = "world";
+  /* The id of the object */
+  attached_object.object.id = "box";
+
+  /* A default pose */
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.position.z = 1.05;
+  object_pose.orientation.w = 1.0;
+
+  /* Define a box to be attached */
+  shape_msgs::msg::SolidPrimitive primitive;
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[0] = 0.05;
+  primitive.dimensions[1] = 0.05;
+  primitive.dimensions[2] = 0.05;
+
+  attached_object.object.primitives.push_back(primitive);
+  attached_object.object.primitive_poses.push_back(object_pose);
+
+  attached_object.object.operation = attached_object.object.ADD;
+
+  moveit_msgs::msg::PlanningScene planning_scene;
+  planning_scene.world.collision_objects.push_back(attached_object.object);
+  planning_scene.is_diff = true;
+  planning_scene_diff_publisher->publish(planning_scene);
+
+  // Go above object
+  // ^^^^^^^^^^^^^^^
+  
   planning_interface::MotionPlanRequest req;
   req.pipeline_id = "ompl";
   req.planner_id = "RRTConnectkConfigDefault";
@@ -88,26 +106,17 @@ int main(int argc, char** argv)
   pose.pose.orientation.y = 0.707;
   pose.pose.orientation.w = 0;
 
-  // A tolerance of 0.01 m is specified in position
-  // and 0.01 radians in orientation
   std::vector<double> tolerance_pose(3, 0.01);
   std::vector<double> tolerance_angle(3, 0.01);
 
-  // We will create the request as a constraint using a helper
-  // function available from the
-  // :moveit_codedir:`kinematic_constraints<moveit_core/kinematic_constraints/include/moveit/kinematic_constraints/kinematic_constraint.hpp>`
-  // package.
   req.group_name = "ur_arm";
   moveit_msgs::msg::Constraints pose_goal =
       kinematic_constraints::constructGoalConstraints("end_effector_link", pose, tolerance_pose, tolerance_angle);
   req.goal_constraints.push_back(pose_goal);
 
-  // Before planning, we will need a Read Only lock on the planning scene so that it does not modify the world
-  // representation while planning
   {
     planning_scene_monitor::LockedPlanningSceneRO lscene(psm);
-    /* Now, call the pipeline and check whether planning was successful. */
-    /* Check that the planning was successful */
+
     if (!planning_pipeline->generatePlan(lscene, req, res) || res.error_code.val != res.error_code.SUCCESS)
     {
       RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
@@ -116,29 +125,7 @@ int main(int argc, char** argv)
     }
   }
 
-  // Visualize the result
-  // ^^^^^^^^^^^^^^^^^^^^
-  rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>::SharedPtr display_publisher =
-      node->create_publisher<moveit_msgs::msg::DisplayTrajectory>("/display_planned_path", 1);
-  moveit_msgs::msg::DisplayTrajectory display_trajectory;
-
-  /* Visualize the trajectory */
-  RCLCPP_INFO(LOGGER, "Visualizing the trajectory");
-  moveit_msgs::msg::MotionPlanResponse response;
-  res.getMessage(response);
-
-  display_trajectory.trajectory_start = response.trajectory_start;
-  display_trajectory.trajectory.push_back(response.trajectory);
-  display_publisher->publish(display_trajectory);
-  visual_tools.publishTrajectoryLine(display_trajectory.trajectory.back(), joint_model_group);
-  visual_tools.trigger();
-
-  /* Wait for user input */
-  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-
-  // Execute
-  // ^^^^^^^
-
+  //execute
   moveit_msgs::msg::RobotTrajectory trajectory_msg;
   res.trajectory->getRobotTrajectoryMsg(trajectory_msg);
 
