@@ -21,6 +21,7 @@ add_executable(move_group_interface_demo src/move_group_interface_demo.cpp)
 add_executable(pickplace_node_mgi src/pickplace_node_mgi.cpp)
 add_executable(planning_scene_api_demo src/moveit_api_demo/planning_scene_api_demo.cpp)
 add_executable(motion_planning_api_demo src/moveit_api_demo/motion_planning_api_demo.cpp)
+add_executable(motion_planning_pipeline_demo src/moveit_api_demo/motion_planning_pipeline_demo.cpp)
 
 target_include_directories(move_to_pose PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -39,6 +40,14 @@ ament_target_dependencies(
   "rclcpp"
   "graph_msgs"
   "rviz_visual_tools"
+)
+
+ament_target_dependencies(
+  motion_planning_pipeline_demo
+  "moveit_ros_planning_interface"
+  "rclcpp"
+  "graph_msgs"
+  "moveit_visual_tools"
 )
 
 ament_target_dependencies(
@@ -85,6 +94,7 @@ install(TARGETS
   pickplace_node_mgi
   planning_scene_api_demo
   motion_planning_api_demo
+  motion_planning_pipeline_demo
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch

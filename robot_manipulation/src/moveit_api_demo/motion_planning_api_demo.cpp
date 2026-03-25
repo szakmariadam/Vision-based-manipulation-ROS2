@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 
   namespace rvt = rviz_visual_tools;
   moveit_visual_tools::MoveItVisualTools visual_tools(motion_planning_api_tutorial_node, "world",
-                                                      "move_group_tutorial", move_group.getRobotModel());
+                                                      "rviz_visual_tools", move_group.getRobotModel());
   visual_tools.enableBatchPublishing();
   visual_tools.deleteAllMarkers();  // clear all old markers
   visual_tools.trigger();
@@ -100,10 +100,10 @@ int main(int argc, char** argv)
     via buttons and keyboard shortcuts in RViz */
   visual_tools.loadRemoteControl();
 
-  /* RViz provides many types of markers, in this demo we will use text, cylinders, and spheres*/
+  // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
   Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-  text_pose.translation().z() = 1.75;
-  visual_tools.publishText(text_pose, "Motion Planning API Demo", rvt::WHITE, rvt::XLARGE);
+  text_pose.translation().z() = 1.0;
+  visual_tools.publishText(text_pose, "motion_planning_api_demo", rvt::WHITE, rvt::XLARGE);
 
   /* Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations */
   visual_tools.trigger();
