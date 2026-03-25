@@ -104,8 +104,8 @@ int main(int argc, char** argv)
   req.pipeline_id = "ompl";
   req.planner_id = "RRTConnectkConfigDefault";
   req.allowed_planning_time = 1.0;
-  req.max_velocity_scaling_factor = 1.0;
-  req.max_acceleration_scaling_factor = 1.0;
+  req.max_velocity_scaling_factor = 0.8;
+  req.max_acceleration_scaling_factor = 0.8;
   planning_interface::MotionPlanResponse res;
   geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "world";
@@ -142,6 +142,41 @@ int main(int argc, char** argv)
   trajectory_execution_manager::TrajectoryExecutionManagerPtr tem(
       new trajectory_execution_manager::TrajectoryExecutionManager(
           node, robot_model, psm->getStateMonitor()));
+
+  tem->push(trajectory_msg);
+  tem->execute();
+  tem->waitForExecution();
+
+  // approach object
+  // ^^^^^^^^^^^^^^^
+
+  pose.header.frame_id = "world";
+  pose.pose.position.z = get_object_pose.position.z;
+  pose.pose.position.x = get_object_pose.position.x;
+  pose.pose.position.y = get_object_pose.position.y;
+  pose.pose.orientation.x = 0.707;
+  pose.pose.orientation.y = 0.707;
+  pose.pose.orientation.w = 0;
+
+  pose_goal =
+      kinematic_constraints::constructGoalConstraints("end_effector_link", pose, tolerance_pose, tolerance_angle);
+
+  req.goal_constraints.clear();
+  req.goal_constraints.push_back(pose_goal);
+
+  {
+    planning_scene_monitor::LockedPlanningSceneRO lscene(psm);
+
+    if (!planning_pipeline->generatePlan(lscene, req, res) || res.error_code.val != res.error_code.SUCCESS)
+    {
+      RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
+      rclcpp::shutdown();
+      return -1;
+    }
+  }
+
+  //execute
+  res.trajectory->getRobotTrajectoryMsg(trajectory_msg);
 
   tem->push(trajectory_msg);
   tem->execute();
