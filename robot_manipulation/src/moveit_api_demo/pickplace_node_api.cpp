@@ -15,6 +15,8 @@
 #include <moveit/robot_trajectory/robot_trajectory.h>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 
+#include <moveit/planning_scene_interface/planning_scene_interface.hpp>
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_api_demo");
 
 int main(int argc, char** argv)
@@ -92,6 +94,12 @@ int main(int argc, char** argv)
   // Go above object
   // ^^^^^^^^^^^^^^^
   
+  //get object position
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+  auto object_poses = planning_scene_interface.getObjectPoses({"box"});
+
+  geometry_msgs::msg::Pose get_object_pose = object_poses["box"];
+
   planning_interface::MotionPlanRequest req;
   req.pipeline_id = "ompl";
   req.planner_id = "RRTConnectkConfigDefault";
@@ -101,7 +109,9 @@ int main(int argc, char** argv)
   planning_interface::MotionPlanResponse res;
   geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "world";
-  pose.pose.position.z = 1.05;
+  pose.pose.position.z = get_object_pose.position.z + 0.2;
+  pose.pose.position.x = get_object_pose.position.x;
+  pose.pose.position.y = get_object_pose.position.y;
   pose.pose.orientation.x = 0.707;
   pose.pose.orientation.y = 0.707;
   pose.pose.orientation.w = 0;
