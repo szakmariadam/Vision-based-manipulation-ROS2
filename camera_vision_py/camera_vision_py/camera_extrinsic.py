@@ -142,25 +142,17 @@ class CameraExtrinsic(Node):
 
         return rvec_workspace, tvec_workspace
 
-    def cameraPose(self, rvec_workspace, tvec_workspace):
-
-        R_cv_to_ros = np.array([
-            [0,  0,  1],
-            [-1, 0,  0],
-            [0, -1,  0]
-        ])
+    def cameraOpticalPose(self, rvec_workspace, tvec_workspace):
 
         # Convert rvec to rotation matrix
         R_workspace2cam, _ = cv2.Rodrigues(rvec_workspace)
 
-        R_ros = R_cv_to_ros @ R_workspace2cam
-        t_ros = R_cv_to_ros @ tvec_workspace.reshape(3, 1)
 
         # Invert the rotation
-        R_cam2workspace = R_ros.T
+        R_cam2workspace = R_workspace2cam.T
 
         # Invert the translation
-        tvec_cam = -R_cam2workspace @ t_ros
+        tvec_cam = -R_cam2workspace @ tvec_workspace
 
         # Convert rotation matrix back to rvec
         rvec_cam, _ = cv2.Rodrigues(R_cam2workspace)
@@ -178,10 +170,9 @@ class CameraExtrinsic(Node):
 
         rvecWorkspace, tvecWorkspace = self.workspacePose(self.frame)
         if isinstance(rvecWorkspace, str): return
-        rvecCam, tvecCam, quat = self.cameraPose(rvecWorkspace, tvecWorkspace)
 
-        self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
-
+        #optical link
+        rvecCam, tvecCam, quat = self.cameraOpticalPose(rvecWorkspace, tvecWorkspace)
 
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
