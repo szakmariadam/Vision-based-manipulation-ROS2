@@ -3,9 +3,10 @@ Panels:
     Help Height: 138
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Camera1/Topic1
       Splitter Ratio: 0.5
-    Tree Height: 394
+    Tree Height: 391
 Visualization Manager:
   Class: ""
   Displays:
@@ -64,6 +65,10 @@ Visualization Manager:
           Value: true
         shoulder_link:
           Value: true
+        table_camera_link:
+          Value: true
+        table_camera_link_optical:
+          Value: true
         tool0:
           Value: true
         upper_arm_link:
@@ -85,6 +90,9 @@ Visualization Manager:
       Show Names: false
       Tree:
         world:
+          table_camera_link:
+            table_camera_link_optical:
+              {}
           workspace_link:
             camera_link:
               {}
@@ -201,6 +209,15 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        table_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        table_camera_link_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         tool0:
           Alpha: 1
           Show Axes: false
@@ -241,20 +258,25 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz_default_plugins/Image
+    - Class: rviz_default_plugins/Camera
       Enabled: true
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Image
-      Normalize Range: true
+      Far Plane Distance: 100
+      Image Rendering: background and overlay
+      Name: Camera
+      Overlay Alpha: 0.5
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /camera/image
+        Value: /table_camera/image
       Value: true
+      Visibility:
+        Grid: true
+        RobotModel: true
+        TF: true
+        Value: true
+      Zoom Factor: 1
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -288,20 +310,20 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5
+      Pitch: 0.34500014781951904
       Target Frame: workspace_link
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.800000011920929
+      Yaw: 1.3599995374679565
     Saved: ~
 Window Geometry:
+  Camera:
+    collapsed: false
   Displays:
     collapsed: false
   Height: 963
   Hide Left Dock: false
   Hide Right Dock: false
-  Image:
-    collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000001b500000365fc0200000002fb000000100044006900730070006c006100790073010000003f00000254000000cc00fffffffb0000000a0049006d00610067006501000002990000010b0000001700ffffff000005c50000036500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000001b500000365fc0200000003fb000000100044006900730070006c006100790073010000003f00000251000000cc00fffffffb0000000a0049006d00610067006501000002990000010b0000000000000000fb0000000c00430061006d00650072006101000002960000010e0000001700ffffff000005c50000036500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Width: 1920
   X: 0
   Y: 32

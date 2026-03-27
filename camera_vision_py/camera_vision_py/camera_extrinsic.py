@@ -17,7 +17,7 @@ class CameraExtrinsic(Node):
 
         self.subscription = self.create_subscription(
             CompressedImage,
-            'camera/image/compressed',
+            'table_camera/image/compressed',
             self.imageCallback,
             10
         )

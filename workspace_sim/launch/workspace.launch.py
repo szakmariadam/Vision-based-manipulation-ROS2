@@ -168,16 +168,16 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
-    # Node to bridge camera topics
     gz_image_bridge_node = Node(
         package="ros_gz_image",
         executable="image_bridge",
         arguments=[
-            "/camera/image",
+            "/table_camera/image",
         ],
         output="screen",
         parameters=[
-             {'camera.image.compressed.jpeg_quality': 75},
+            {'use_sim_time': True,
+             'table_camera.image.compressed.jpeg_quality': 75,},
         ],
     )
 
