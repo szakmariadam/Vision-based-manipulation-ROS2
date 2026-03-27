@@ -11,7 +11,7 @@ class ImageSaver(Node):
         super().__init__('image_saver')
         self.subscription = self.create_subscription(
             Image,
-            '/camera/image',
+            '/table_camera/image',
             self.image_callback,
             10)
         self.bridge = CvBridge()
