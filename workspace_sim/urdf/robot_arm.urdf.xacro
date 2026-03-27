@@ -117,7 +117,7 @@
   </link>
 
   <joint type="fixed" name="table_camera_joint">
-    <origin xyz="0 0 2.5" rpy="0 1.5707 0"/>
+    <origin xyz="-1.1 0 2.13" rpy="0 0.86 0"/>
     <child link="table_camera_link"/>
     <parent link="world"/>
   </joint>

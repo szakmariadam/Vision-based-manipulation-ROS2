@@ -30,7 +30,8 @@ setup(
         'console_scripts': [
             'image_saver = camera_vision_py.image_saver:main',
             'camera_extrinsic = camera_vision_py.camera_extrinsic:main',
-            "ip_camera_publisher = camera_vision_py.ip_camera_publisher:main"
+            "ip_camera_publisher = camera_vision_py.ip_camera_publisher:main",
+            "calibration_intrinsic_from_topic = camera_vision_py.calibration_intrinsic_from_topic:main"
         ],
     },
 )
