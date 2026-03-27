@@ -10,6 +10,7 @@ from ament_index_python import get_package_share_directory
 from cv_bridge import CvBridge
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster
+from scipy.spatial.transform import Rotation as R
 
 class CameraExtrinsic(Node):
     def __init__(self):
@@ -142,19 +143,31 @@ class CameraExtrinsic(Node):
         return rvec_workspace, tvec_workspace
 
     def cameraPose(self, rvec_workspace, tvec_workspace):
+
+        R_cv_to_ros = np.array([
+            [0,  0,  1],
+            [-1, 0,  0],
+            [0, -1,  0]
+        ])
+
         # Convert rvec to rotation matrix
         R_workspace2cam, _ = cv2.Rodrigues(rvec_workspace)
 
+        R_ros = R_cv_to_ros @ R_workspace2cam
+        t_ros = R_cv_to_ros @ tvec_workspace.reshape(3, 1)
+
         # Invert the rotation
-        R_cam2workspace = R_workspace2cam.T
+        R_cam2workspace = R_ros.T
 
         # Invert the translation
-        tvec_cam = -R_cam2workspace @ tvec_workspace
+        tvec_cam = -R_cam2workspace @ t_ros
 
         # Convert rotation matrix back to rvec
         rvec_cam, _ = cv2.Rodrigues(R_cam2workspace)
 
-        return rvec_cam, tvec_cam
+        quat = R.from_matrix(R_cam2workspace).as_quat()  # [x, y, z, w]
+
+        return rvec_cam, tvec_cam, quat
     
     def timer_callback(self):
         
@@ -165,9 +178,10 @@ class CameraExtrinsic(Node):
 
         rvecWorkspace, tvecWorkspace = self.workspacePose(self.frame)
         if isinstance(rvecWorkspace, str): return
-        rvecCam, tvecCam = self.cameraPose(rvecWorkspace, tvecWorkspace)
+        rvecCam, tvecCam, quat = self.cameraPose(rvecWorkspace, tvecWorkspace)
 
-        #self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
+        self.get_logger().info("camera pose found: " + str(rvecCam.ravel()) + str(tvecCam.ravel()))
+
 
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
@@ -178,9 +192,10 @@ class CameraExtrinsic(Node):
         t.transform.translation.y = float(tvecCam[1])
         t.transform.translation.z = float(tvecCam[2])
 
-        t.transform.rotation.x = float(rvecCam[0])
-        t.transform.rotation.y = float(rvecCam[1])
-        t.transform.rotation.z = float(rvecCam[2])
+        t.transform.rotation.x = float(quat[0])
+        t.transform.rotation.y = float(quat[1])
+        t.transform.rotation.z = float(quat[2])
+        t.transform.rotation.w = float(quat[3])
 
         self.transformBroadcaster.sendTransform(t)
 

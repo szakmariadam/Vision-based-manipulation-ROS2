@@ -2,7 +2,7 @@ import numpy as np
 from dt_apriltags import Detector
 import cv2
 
-image_path = "camera_vision_py/calib_images/workspace_center.png"
+image_path = "camera_vision_py/calib_images/fenn.png"
 tagFamily = "tagStandard41h12"
 
 square_size = 0.6
@@ -83,7 +83,7 @@ imgpoints = np.array([
 
 objpoints = tagCorners
 
-retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, K, dist, flags=cv2.SOLVEPNP_IPPE)
+retval, rvec_workspace, tvec_workspace = cv2.solvePnP(objpoints, imgpoints, K, dist)
 
 print("pose found:", retval)
 if retval:
@@ -97,11 +97,9 @@ axis = np.float32([
     [0, 0, -0.02]   # Z axis (blue)
 ])
 
-proj_points, _ = cv2.projectPoints(objpoints, rvec_workspace, tvec_workspace, K, dist)
-proj_points = proj_points.reshape(-1, 2)
-img_points = imgpoints.reshape(-1, 2)
-error = cv2.norm(imgpoints.astype(np.float32), proj_points.astype(np.float32), cv2.NORM_L2) / len(proj_points)
-print("Reprojection error (pixels):", error)
+projected, _ = cv2.projectPoints(objpoints, rvec_workspace, tvec_workspace, K, dist)
+error = cv2.norm(imgpoints - projected.reshape(-1, 2), cv2.NORM_L2) / len(objpoints)
+print(f"Reprojection error: {error:.3f} px")
 
 # Convert rvec to rotation matrix
 R_workspace2cam, _ = cv2.Rodrigues(rvec_workspace)
@@ -122,7 +120,7 @@ print("tvec_cam:", tvec_cam.ravel())
 #visualization
 imgpts, _ = cv2.projectPoints(axis, rvec_workspace, tvec_workspace, K, dist)
 imgpts = np.int32(imgpts).reshape(-1, 2)
-center = (639,290)
+center = (565,430)
 
 img = cv2.line(img, center, tuple(imgpts[0]), (0, 0, 255), 1)  # X - red
 img = cv2.line(img, center, tuple(imgpts[1]), (0, 255, 0), 1)  # Y - green
