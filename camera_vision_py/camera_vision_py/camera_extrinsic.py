@@ -172,7 +172,7 @@ class CameraExtrinsic(Node):
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = "workspace_link"
-        t.child_frame_id = "camera_link"
+        t.child_frame_id = "camera_link_optical"
 
         t.transform.translation.x = float(tvecCam[0])
         t.transform.translation.y = float(tvecCam[1])

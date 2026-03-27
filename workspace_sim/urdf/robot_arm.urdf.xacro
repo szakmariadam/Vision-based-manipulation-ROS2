@@ -45,11 +45,11 @@
 
   <joint type="fixed" name="camera_joint">
     <origin xyz="0 0 1" rpy="0 0 0"/>
-    <child link="camera_link"/>
+    <child link="camera_link_optical"/>
     <parent link="workspace_link"/>
   </joint>
 
-  <link name='camera_link'>
+  <link name='camera_link_optical'>
     <inertial>
       <mass value="1.0e-03"/>
       <origin xyz="-0.6 0 1.63" rpy="0 0.86 0"/>
@@ -117,7 +117,7 @@
   </link>
 
   <joint type="fixed" name="table_camera_joint">
-    <origin xyz="-1.1 0 2.13" rpy="0 0.86 0"/>
+    <origin xyz="-1.1 -0.1 2.13" rpy="0 0.86 0"/>
     <child link="table_camera_link"/>
     <parent link="world"/>
   </joint>
