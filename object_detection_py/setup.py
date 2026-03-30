@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'detect_object = object_detection_py.detect_object:main',
         ],
     },
 )
