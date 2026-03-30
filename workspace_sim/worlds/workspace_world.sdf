@@ -61,7 +61,7 @@
             </link>
         </model>
 
-        <model name="cube">
+        <!--model name="cube">
             <pose>0 0 1.05 0 0 0</pose>
             <static>false</static>
             <link name="cube_link">
@@ -84,7 +84,7 @@
                     </geometry>
                 </collision>
             </link>
-        </model>
+        </model-->
 
         <include>
             <name>tag0</name>
@@ -119,6 +119,13 @@
             <static>false</static>
             <pose>0 0 0 0 0 0</pose>
             <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table</uri>
+        </include>
+
+        <include>
+            <name>Mouse</name>
+            <static>false</static>
+            <pose>0 0 1.05 0 0 0</pose>
+            <uri>https://fuel.gazebosim.org/1.0/GoogleResearch/models/Razer_Abyssus_Ambidextrous_Gaming_Mouse</uri>
         </include>
 
     </world>
