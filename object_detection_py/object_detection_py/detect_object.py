@@ -24,8 +24,8 @@ class DetectObject(Node):
         self.classes_publisher = self.create_publisher(
             String,
             "/object_detection/classes",
-            5
         )
+            5
 
         self.bb_pos_publisher = self.create_publisher(
             Float64MultiArray,
@@ -37,11 +37,11 @@ class DetectObject(Node):
             Image,
             "/object_detection/image_annoted",
             5
+
         )
-
         self.timer = self.create_timer(0.05, self.timer_callback)
-
         self.model = YOLO("yolo26n.pt")
+
 
         self.get_logger().info("Object detection node started.")
 
@@ -54,8 +54,8 @@ class DetectObject(Node):
             class_names = [det_result[0].names[i] for i in classes]
 
             bb_positions = det_result[0].boxes.xyxy.cpu().numpy()
-
             bb_positions_flat = np.concatenate(bb_positions)
+
 
             self.classes_publisher.publish(String(data=str(class_names)))
             self.bb_pos_publisher.publish(Float64MultiArray(data=bb_positions_flat))
