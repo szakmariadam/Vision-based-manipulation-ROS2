@@ -24,8 +24,8 @@ class DetectObject(Node):
         self.classes_publisher = self.create_publisher(
             String,
             "/object_detection/classes",
-        )
             5
+        )
 
         self.bb_pos_publisher = self.create_publisher(
             Float64MultiArray,
@@ -40,8 +40,8 @@ class DetectObject(Node):
 
         )
         self.timer = self.create_timer(0.05, self.timer_callback)
-        self.model = YOLO("yolo26n.pt")
 
+        self.model = YOLO("yolo26n.pt")
 
         self.get_logger().info("Object detection node started.")
 
