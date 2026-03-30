@@ -9,12 +9,16 @@ results = model("camera_vision_py/calib_images/bottle.png")
 
 img = results[0].plot()
 
-for r in results:
-    boxes = r.boxes
-    for box in boxes:
-        print("Class:", int(box.cls))
-        print("Confidence:", float(box.conf))
-        print("Coordinates:", box.xyxy)
+
+
+classes = results[0].boxes.cls.cpu().numpy().astype(int)
+
+names = [results[0].names[i] for i in classes]
+print(names)
+
+bb_positions = results[0].boxes.xyxy.cpu().numpy()
+
+print(bb_positions)
 
 cv2.imshow("result", img)
 cv2.waitKey(0)

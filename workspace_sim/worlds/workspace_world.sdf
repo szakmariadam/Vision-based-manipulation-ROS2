@@ -122,11 +122,18 @@
         </include>
 
         <include>
-            <name>Mouse</name>
+            <name>Bottle</name>
             <static>false</static>
             <pose>0 0 1.015 0 0 0</pose>
             <uri>https://fuel.gazebosim.org/1.0/GoogleResearch/models/Weston_No_22_Cajun_Jerky_Tonic_12_fl_oz_nLj64ZnGwDh</uri>
         </include>
+
+        <!--include>
+            <name>Bottle_2</name>
+            <static>false</static>
+            <pose>0 -0.2 1.015 0 0 0</pose>
+            <uri>https://fuel.gazebosim.org/1.0/GoogleResearch/models/Weston_No_22_Cajun_Jerky_Tonic_12_fl_oz_nLj64ZnGwDh</uri>
+        </include-->
 
     </world>
 </sdf>
