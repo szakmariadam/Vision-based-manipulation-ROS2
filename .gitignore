@@ -4,3 +4,5 @@ sim/sim_vision/venv/
 sim/sim_vision/config/camera_calib.npz
 
 .vscode/
+
+yolo26n.pt
