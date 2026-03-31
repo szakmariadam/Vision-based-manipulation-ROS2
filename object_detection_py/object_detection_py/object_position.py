@@ -53,7 +53,12 @@ class ObjectPosition(Node):
             x2 = bb_pos_array[i*4+2]
             y2 = bb_pos_array[i*4+3]
 
-            self.get_logger().info(f'{classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
+            #self.get_logger().info(f'{classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
+            #get center in image
+            if classes_array[i] == 'bottle':
+                center_img = [int(x1+(x2-x1)/2), int(y2-(y2-y1)/7)]
+                self.get_logger().info(f'{classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
+
 
 
 def main(args=None):
