@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CompressedImage
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import String, Float32MultiArray
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
@@ -28,7 +28,7 @@ class DetectObject(Node):
         )
 
         self.bb_pos_publisher = self.create_publisher(
-            Float64MultiArray,
+            Float32MultiArray,
             "/object_detection/bb_positions",
             5
         )
@@ -56,7 +56,7 @@ class DetectObject(Node):
             bb_positions_flat = np.concatenate(bb_positions)
 
             self.classes_publisher.publish(String(data=str(class_names)))
-            self.bb_pos_publisher.publish(Float64MultiArray(data=bb_positions_flat))
+            self.bb_pos_publisher.publish(Float32MultiArray(data=bb_positions_flat))
 
             #publish image
             img_msg = self.bridge.cv2_to_imgmsg(det_annoted, encoding="bgr8")

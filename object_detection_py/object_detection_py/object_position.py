@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import String, Float32MultiArray
 from ament_index_python import get_package_share_directory
 from cv_bridge import CvBridge
 from message_filters import Subscriber, ApproximateTimeSynchronizer
@@ -19,7 +19,7 @@ class ObjectPosition(Node):
 
         self.bb_pos_subscription = Subscriber(
             self,
-            Float64MultiArray,
+            Float32MultiArray,
             "/object_detection/bb_positions",
             5,
         )
@@ -32,7 +32,7 @@ class ObjectPosition(Node):
         )
 
         self.obj_pos_publisher = self.create_publisher(
-            Float64MultiArray,
+            Float32MultiArray,
             "/object_detection/obj_positions",
             5
         )
@@ -76,6 +76,8 @@ class ObjectPosition(Node):
         R, _ = cv2.Rodrigues(r)
         t = np.array([camera_pose_t.x, camera_pose_t.y, camera_pose_t.z])
 
+        object_positions = []
+
         for i in range(0, len(classes_array)):
             bb_pos_array_i = np.array([])
             for j in range(0, 4):
@@ -96,7 +98,10 @@ class ObjectPosition(Node):
             lambd = (0 - origin[2]) / ray_workspace[2] #solve lambda for intersection with ground plane (z=0)
             obj_pos = origin + lambd * ray_workspace #ray equation
 
-            self.get_logger().info(f'{classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
+            #self.get_logger().info(f'{classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
+            for pos in obj_pos: object_positions.append(pos)
+
+        self.obj_pos_publisher.publish(Float32MultiArray(data=object_positions))
 
 
 
