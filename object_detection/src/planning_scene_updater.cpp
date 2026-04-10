@@ -78,11 +78,38 @@ private:
 
     rclcpp::Publisher<moveit_msgs::msg::PlanningScene>::SharedPtr planning_scene_diff_publisher;
 
+    moveit_msgs::msg::CollisionObject collision_object;
+    geometry_msgs::msg::Pose pose;
+    shape_msgs::msg::SolidPrimitive primitive;
+    moveit_msgs::msg::PlanningScene planning_scene;
+
     void process()
     {
         if (classes_ && obj_pos_)
         {
-            RCLCPP_INFO(this->get_logger(),"Timer read: [%s] [%f]", classes_->data.c_str(), obj_pos_->data[0]);
+            collision_object.header.frame_id = "workspace_link";
+            /* The id of the object */
+            collision_object.id = "box";
+
+            /* Define a box to be attached */
+            primitive.type = primitive.CYLINDER;
+            primitive.dimensions.resize(2);
+            primitive.dimensions[0] = 0.18;
+            primitive.dimensions[1] = 0.03;
+
+            pose.position.z = 0.09;
+            pose.orientation.w = 1.0;
+
+
+            collision_object.primitives.push_back(primitive);
+            collision_object.primitive_poses.push_back(pose);
+
+            collision_object.operation = collision_object.ADD;
+
+            planning_scene.world.collision_objects.clear();
+            planning_scene.world.collision_objects.push_back(collision_object);
+            planning_scene.is_diff = true;
+            planning_scene_diff_publisher->publish(planning_scene);
         }
         else
         {
