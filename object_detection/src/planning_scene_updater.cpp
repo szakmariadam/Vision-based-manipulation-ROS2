@@ -16,6 +16,12 @@
 #include <moveit_msgs/msg/display_robot_state.hpp>
 #include <moveit_msgs/srv/apply_planning_scene.hpp>
 
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
+
 using std::placeholders::_1;
 
 class PlanningSceneUpdater : public rclcpp::Node
@@ -57,7 +63,26 @@ public:
 private:
     void classes_callback(const std_msgs::msg::String::SharedPtr msg)
     {
-        classes_ = msg;
+        s = msg->data;
+
+        // Remove brackets
+        s.erase(std::remove(s.begin(), s.end(), '['), s.end());
+        s.erase(std::remove(s.begin(), s.end(), ']'), s.end());
+        s.erase(std::remove(s.begin(), s.end(), '\''), s.end());
+
+        // Split by comma
+        std::stringstream ss(s);
+        std::string item;
+
+        while (std::getline(ss, item, ',')) {
+            item.erase(0, item.find_first_not_of(" \t"));
+            item.erase(item.find_last_not_of(" \t") + 1);
+
+            if (!item.empty()) {
+                classes.push_back(item);
+            }
+        }
+
     }
 
     void obj_pos_callback(const std_msgs::msg::Float32MultiArray::SharedPtr msg)
@@ -68,7 +93,9 @@ private:
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr classes_subscription_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr obj_pos_subscription_;
 
-    std_msgs::msg::String::SharedPtr classes_;
+    std::vector<std::string> classes;
+    std::string s;
+
     std_msgs::msg::Float32MultiArray::SharedPtr obj_pos_;
 
     rclcpp::TimerBase::SharedPtr timer_;
@@ -85,8 +112,9 @@ private:
 
     void process()
     {
-        if (classes_ && obj_pos_)
+        if (/*classes &&*/ obj_pos_)
         {
+            //RCLCPP_INFO(this->get_logger(), "%s", classes[0].c_str());
             collision_object.header.frame_id = "workspace_link";
             /* The id of the object */
             collision_object.id = "box";
