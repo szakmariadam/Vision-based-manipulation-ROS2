@@ -9,12 +9,14 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
 
 add_executable(planning_scene_updater src/planning_scene_updater.cpp)
 
 ament_target_dependencies(planning_scene_updater
   rclcpp
   std_msgs
+  moveit_ros_planning_interface
 )
 
 install(TARGETS
