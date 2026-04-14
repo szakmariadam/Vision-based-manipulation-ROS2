@@ -85,10 +85,9 @@ class ObjectPosition(Node):
 
             #self.get_logger().info(f'{classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
 
-            #get center in image
-            if classes_array[i] == 'bottle':
-                center_img = [int(bb_pos_array[0]+(bb_pos_array[2]-bb_pos_array[0])/2), int(bb_pos_array[3]-(bb_pos_array[3]-bb_pos_array[1])/7)]
-                #self.get_logger().info(f'{classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
+            #get bottom center in image
+            center_img = [int(bb_pos_array[0]+(bb_pos_array[2]-bb_pos_array[0])/2), int(bb_pos_array[3])]
+            #self.get_logger().info(f'{classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
             
             ray_cam = np.linalg.inv(self.K) @ np.array([center_img[0], center_img[1], 1.0]) #pixel to direction in camera space
             ray_workspace = R @ ray_cam #transform ray direction to workpspace space
@@ -97,6 +96,11 @@ class ObjectPosition(Node):
 
             lambd = (0 - origin[2]) / ray_workspace[2] #solve lambda for intersection with ground plane (z=0)
             obj_pos = origin + lambd * ray_workspace #ray equation
+            
+            #get object center from object side
+            #Only works from this angle!
+            if classes_array[i] == 'bottle':
+                obj_pos[1] = obj_pos[1] + 0.03 
 
             #self.get_logger().info(f'{classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
             for pos in obj_pos: object_positions.append(pos)
