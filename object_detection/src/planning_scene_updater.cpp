@@ -63,6 +63,7 @@ public:
 private:
     void classes_callback(const std_msgs::msg::String::SharedPtr msg)
     {
+        std::string s;
         s = msg->data;
 
         // Remove brackets
@@ -71,9 +72,11 @@ private:
         s.erase(std::remove(s.begin(), s.end(), '\''), s.end());
 
         // Split by comma
+        //std::vector<std::string> classes;
         std::stringstream ss(s);
         std::string item;
 
+        classes.clear();
         while (std::getline(ss, item, ',')) {
             item.erase(0, item.find_first_not_of(" \t"));
             item.erase(item.find_last_not_of(" \t") + 1);
@@ -93,9 +96,6 @@ private:
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr classes_subscription_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr obj_pos_subscription_;
 
-    std::vector<std::string> classes;
-    std::string s;
-
     std_msgs::msg::Float32MultiArray::SharedPtr obj_pos_;
 
     rclcpp::TimerBase::SharedPtr timer_;
@@ -109,36 +109,46 @@ private:
     geometry_msgs::msg::Pose pose;
     shape_msgs::msg::SolidPrimitive primitive;
 
+    std::vector<std::string> classes;
+
     void process()
     {
-        if (/*classes &&*/ obj_pos_)
+        if (/*!classes.empty() &&*/ obj_pos_)
         {
-            moveit_msgs::msg::PlanningScene planning_scene;
-            moveit_msgs::msg::CollisionObject collision_object;
+            //RCLCPP_INFO(this->get_logger(), "classes size: %i", classes.size());
+            for (int i=0; i<classes.size(); i++)
+            {
+                if(classes[i] == "bottle")
+                {
+                    moveit_msgs::msg::PlanningScene planning_scene;
+                    moveit_msgs::msg::CollisionObject collision_object;
 
-            collision_object.header.frame_id = "workspace_link";
-            collision_object.id = "bottle";
+                    collision_object.header.frame_id = "workspace_link";
+                    collision_object.id = "bottle";
 
-            primitive.type = primitive.CYLINDER;
-            primitive.dimensions.resize(2);
-            primitive.dimensions[0] = 0.18;
-            primitive.dimensions[1] = 0.03;
+                    primitive.type = primitive.CYLINDER;
+                    primitive.dimensions.resize(2);
+                    primitive.dimensions[0] = 0.18;
+                    primitive.dimensions[1] = 0.03;
 
-            pose.position.x = obj_pos_->data[0];
-            pose.position.y = obj_pos_->data[1];
-            pose.position.z = 0.09;
-            pose.orientation.w = 1.0;
+                    pose.position.x = obj_pos_->data[i*4];
+                    pose.position.y = obj_pos_->data[i*4 + 1];
+                    pose.position.z = 0.09;
+                    pose.orientation.w = 1.0;
 
 
-            collision_object.primitives.push_back(primitive);
-            collision_object.primitive_poses.push_back(pose);
+                    collision_object.primitives.push_back(primitive);
+                    collision_object.primitive_poses.push_back(pose);
 
-            collision_object.operation = collision_object.ADD;
+                    collision_object.operation = collision_object.ADD;
 
-            planning_scene.world.collision_objects.clear();
-            planning_scene.world.collision_objects.push_back(collision_object);
-            planning_scene.is_diff = true;
-            planning_scene_diff_publisher->publish(planning_scene);
+                    planning_scene.world.collision_objects.clear();
+                    planning_scene.world.collision_objects.push_back(collision_object);
+                    planning_scene.is_diff = true;
+                    planning_scene_diff_publisher->publish(planning_scene);
+
+                }
+            }
         }
         else
         {
