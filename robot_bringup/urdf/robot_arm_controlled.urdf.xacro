@@ -5,10 +5,13 @@
   <!--The driver already provides a control tag for the UR arm, we can directly include-->
   <xacro:include filename="$(find ur_robot_driver)/urdf/ur.ros2_control.xacro"/>
 
-  <xacro:include filename="$(find rh_p12_rn_description)/urdf/rh_p12_rn_macro.xacro"/>
+  <xacro:include filename="$(find rh_p12_rn_a_description)/urdf/rh_p12_rn_a.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_a_description)/gazebo/rh_p12_rn_a.gazebo.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_a_description)/ros2_control/rh_p12_rn_a.ros2_control.xacro" />
+
 
   <!--We need to specify the arguments used for parametrizing our description-->
-  <xacro:arg name="ur_type" default="ur20"/>
+  <xacro:arg name="ur_type" default="ur5e"/>
   <xacro:arg name="joint_limit_parameters_file" default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml"/>
   <xacro:arg name="kinematics_parameters_file" default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml"/>
   <xacro:arg name="physical_parameters_file" default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml"/>
@@ -21,6 +24,9 @@
   <xacro:arg name="ur_input_recipe_filename" default="$(find ur_robot_driver)/resources/rtde_input_recipe.txt"/>
   <xacro:arg name="use_mock_hardware" default="false" />
   <xacro:arg name="mock_sensor_commands" default="false" />
+  <xacro:arg name="use_fake_hardware" default="false" />
+
+  <xacro:arg name="use_sim" default="false" />
 
   <link name="world" />
 
@@ -119,6 +125,14 @@
   <link name="table_camera_link_optical">
   </link>
 
+  <!--joint name="gripper_joint" type="fixed">
+    <parent link="$(arg ur_type)_tool0"/>
+    <child link="$(arg ur_type)_rh_p12_rn_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint-->
+
+  <!--xacro:rh_p12_rn_a prefix="$(arg ur_type)_" /-->
+
   <!--Create the control tag for the UR robot-->
   <xacro:ur_ros2_control
     name="$(arg ur_type)"
@@ -134,5 +148,11 @@
   />
 
   <!--If you had more controlled devices in your description, e.g. a gripper, you can add another ros2_control tag here-->
+  
+  <!--xacro:rh_p12_rn_a_system
+    name="RH-P12-RN-A-System" prefix="$(arg ur_type)_" use_sim="$(arg use_sim)"
+    use_fake_hardware="$(arg use_fake_hardware)"
+    fake_sensor_commands="$(arg mock_sensor_commands)"/-->
+
 
 </robot>
