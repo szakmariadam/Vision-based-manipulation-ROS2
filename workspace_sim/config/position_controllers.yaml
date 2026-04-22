@@ -30,10 +30,7 @@ controller_manager:
 gripper_controller:
   ros__parameters:
     joints:
-      - rh_p12_rn
-      - rh_r2
-      - rh_l1
-      - rh_l2
+      - rh_r1
     command_interfaces:
       - position
     state_interfaces:

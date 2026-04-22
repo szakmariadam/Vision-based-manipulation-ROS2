@@ -6,6 +6,9 @@
   <xacro:include filename="$(find ur_description)/urdf/inc/ur_joint_control.xacro" />
   <xacro:include filename="$(find rh_p12_rn_description)/urdf/joint_control.xacro" />
 
+  <xacro:include filename="$(find rh_p12_rn_a_description_custom)/urdf/rh_p12_rn_a.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_a_description)/ros2_control/rh_p12_rn_a.ros2_control.xacro" />
+
   <xacro:arg name="ur_type" default="ur5e"/>
 
   <!-- parameters -->
@@ -21,6 +24,10 @@
 
   <xacro:arg name="simulation_controllers" default="" />
   <xacro:arg name="ros_namespace" default="" />
+
+  <xacro:arg name="use_sim" default="true" />
+  <xacro:arg name="use_fake_hardware" default="false" />
+  <xacro:arg name="fake_sensor_commands" default="false" />
 
   <link name="world"/>
 
@@ -50,16 +57,16 @@
     </inertial>
   </link>
 
-  <joint type="fixed" name="camera_joint">
+  <joint type="fixed" name="camera_joint_optical">
     <origin xyz="0 0 1" rpy="0 0 0"/>
-    <child link="camera_link"/>
+    <child link="camera_link_optical"/>
     <parent link="workspace_link"/>
   </joint>
 
-  <link name='camera_link'>
+  <link name='camera_link_optical'>
     <inertial>
       <mass value="1.0e-03"/>
-      <origin xyz="-0.6 0 1.63" rpy="0 0.86 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia
           ixx="1e-6" ixy="0" ixz="0"
           iyy="1e-6" iyz="0"
@@ -93,7 +100,13 @@
     <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:ur_robot>
 
-  <xacro:rh_p12_rn parent="$(arg tf_prefix)tool0"/>
+  <joint name="$(arg tf_prefix)gripper_joint" type="fixed">
+    <parent link="tool0"/>
+    <child link="$(arg tf_prefix)rh_p12_rn_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:rh_p12_rn_a prefix="$(arg tf_prefix)" />
 
   <!-- End effector -->
   <joint name="end_effector_joint" type="fixed">
@@ -122,5 +135,5 @@
                izz="1.0e-03" />
     </inertial>
   </link>
-  
+
 </robot>

@@ -7,6 +7,7 @@
   <xacro:include filename="$(find rh_p12_rn_description)/urdf/joint_control.xacro" />
 
   <xacro:include filename="$(find rh_p12_rn_a_description_custom)/urdf/rh_p12_rn_a.xacro" />
+  <xacro:include filename="$(find rh_p12_rn_a_description)/ros2_control/rh_p12_rn_a.ros2_control.xacro" />
 
   <xacro:arg name="ur_type" default="ur5e"/>
 
@@ -23,6 +24,10 @@
 
   <xacro:arg name="simulation_controllers" default="" />
   <xacro:arg name="ros_namespace" default="" />
+
+  <xacro:arg name="use_sim" default="true" />
+  <xacro:arg name="use_fake_hardware" default="false" />
+  <xacro:arg name="fake_sensor_commands" default="false" />
 
   <link name="world"/>
 
@@ -216,5 +221,10 @@
     />
 
   </ros2_control>
+
+  <xacro:rh_p12_rn_a_system
+    name="RH-P12-RN-A-System" prefix="$(arg tf_prefix)" use_sim="$(arg use_sim)"
+    use_fake_hardware="$(arg use_fake_hardware)"
+    fake_sensor_commands="$(arg fake_sensor_commands)"/>
 
 </robot>
