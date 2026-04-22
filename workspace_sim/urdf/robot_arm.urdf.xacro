@@ -6,6 +6,8 @@
   <xacro:include filename="$(find ur_description)/urdf/inc/ur_joint_control.xacro" />
   <xacro:include filename="$(find rh_p12_rn_description)/urdf/joint_control.xacro" />
 
+  <xacro:include filename="$(find rh_p12_rn_a_description_custom)/urdf/rh_p12_rn_a.xacro" />
+
   <xacro:arg name="ur_type" default="ur5e"/>
 
   <!-- parameters -->
@@ -86,7 +88,13 @@
     <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:ur_robot>
 
-  <xacro:rh_p12_rn parent="$(arg tf_prefix)tool0"/>
+  <joint name="$(arg tf_prefix)gripper_joint" type="fixed">
+    <parent link="tool0"/>
+    <child link="$(arg tf_prefix)rh_p12_rn_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:rh_p12_rn_a prefix="$(arg tf_prefix)" />
 
   <!-- End effector -->
   <joint name="end_effector_joint" type="fixed">
@@ -206,8 +214,6 @@
       tf_prefix="$(arg tf_prefix)"
       initial_positions="${dict(shoulder_pan_joint=0.0,shoulder_lift_joint=-1.57,elbow_joint=0.0,wrist_1_joint=-1.57,wrist_2_joint=0.0,wrist_3_joint=0.0)}"
     />
-
-    <xacro:rh_p12_rn_joint_control_description/>
 
   </ros2_control>
 
