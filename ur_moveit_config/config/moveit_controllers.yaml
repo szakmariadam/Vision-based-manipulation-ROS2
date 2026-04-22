@@ -21,9 +21,6 @@ moveit_simple_controller_manager:
   gripper_controller:
     type: FollowJointTrajectory
     joints:
-      - rh_l1
-      - rh_l2
-      - rh_p12_rn
-      - rh_r2
+      - rh_r1
     action_ns: follow_joint_trajectory
     default: true
