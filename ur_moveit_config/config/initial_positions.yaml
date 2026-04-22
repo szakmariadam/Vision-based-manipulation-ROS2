@@ -2,10 +2,7 @@
 
 initial_positions:
   elbow_joint: 0
-  rh_l1: 0
-  rh_l2: 0
-  rh_p12_rn: 0
-  rh_r2: 0
+  rh_r1: 0
   shoulder_lift_joint: 0
   shoulder_pan_joint: 0
   wrist_1_joint: 0
