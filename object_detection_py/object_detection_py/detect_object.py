@@ -46,7 +46,7 @@ class DetectObject(Node):
 
     def timer_callback(self):
         try:
-            det_result = self.model(self.image)
+            det_result = self.model.predict(self.image, verbose=False)
             det_annoted = det_result[0].plot()
 
             classes = det_result[0].boxes.cls.cpu().numpy().astype(int)

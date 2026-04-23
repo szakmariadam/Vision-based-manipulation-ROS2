@@ -5,7 +5,7 @@ import cv2
 model = YOLO("yolo26n.pt")
 
 # Run inference with the YOLO26n model on the 'bus.jpg' image
-results = model("camera_vision_py/calib_images/bottle.png")
+results = model.predict("camera_vision_py/calib_images/bottle.png", verbose=True)
 
 img = results[0].plot()
 
