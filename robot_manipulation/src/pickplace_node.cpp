@@ -248,6 +248,21 @@ mtc::Task MTCTaskNode::createTask()
 
 
         {
+            auto stage = std::make_unique<mtc::stages::MoveRelative>("place", cartesian_planner);
+            stage->properties().set("marker_ns", "approach_object");
+            stage->properties().set("link", hand_frame);
+            stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
+            stage->setMinMaxDistance(0.1, 0.15);
+
+            // Set hand forward direction
+            geometry_msgs::msg::Vector3Stamped vec;
+            vec.header.frame_id = hand_frame;
+            vec.vector.z = 1.0;
+            stage->setDirection(vec);
+            place->insert(std::move(stage));
+        }
+
+        {
             // Sample place pose
             auto stage = std::make_unique<mtc::stages::GeneratePlacePose>("generate place pose");
             stage->properties().configureInitFrom(mtc::Stage::PARENT);
