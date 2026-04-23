@@ -54,6 +54,7 @@ class ObjectPosition(Node):
             )
         data = np.load(intrinsics_path)
         self.K = data['camera_matrix']
+        self.dist = data['dist_coeffs']
 
         self.transform_buffer = Buffer()
         self.transform_listener = TransformListener(self.transform_buffer, self)
@@ -89,7 +90,10 @@ class ObjectPosition(Node):
             center_img = [int(bb_pos_array[0]+(bb_pos_array[2]-bb_pos_array[0])/2), int(bb_pos_array[3])]
             #self.get_logger().info(f'{classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
             
-            ray_cam = np.linalg.inv(self.K) @ np.array([center_img[0], center_img[1], 1.0]) #pixel to direction in camera space
+            pts = np.array([[[center_img[0], center_img[1]]]], dtype=np.float32)
+            undistorted = cv2.undistortPoints(pts, self.K, self.dist) #undistort points
+
+            ray_cam = np.array([undistorted[0,0,0], undistorted[0,0,1], 1.0]) #direction in camera space
             ray_workspace = R @ ray_cam #transform ray direction to workpspace space
             ray_workspace /= np.linalg.norm(ray_workspace) #normalize
             origin = t #camera center (in workspace space)
