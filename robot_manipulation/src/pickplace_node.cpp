@@ -270,8 +270,9 @@ mtc::Task MTCTaskNode::createTask()
             stage->setObject("bottle");
 
             geometry_msgs::msg::PoseStamped target_pose_msg;
-            target_pose_msg.header.frame_id = "bottle";
-            target_pose_msg.pose.position.y = -0.2;
+            target_pose_msg.header.frame_id = "workspace_link";
+            target_pose_msg.pose.position.y = -0.5;
+            target_pose_msg.pose.position.z = 0.09;
             target_pose_msg.pose.orientation.w = 1.0;
             stage->setPose(target_pose_msg);
             stage->setMonitoredStage(attach_object_stage);  // Hook into attach_object_stage
