@@ -4,14 +4,14 @@ from moveit_configs_utils import MoveItConfigsBuilder
 
 
 def generate_launch_description():
-    moveit_config = MoveItConfigsBuilder("ur", package_name="ur_moveit_config").to_dict()
+    moveit_config = MoveItConfigsBuilder("moveit_resources_panda").to_dict()
 
     # MTC Demo node
     pick_place_demo = Node(
         # package="mtc_tutorial",
         # executable="mtc_node",
         package="robot_manipulation",
-        executable="pickplace_demo_node",
+        executable="mtc_node",
         output="screen",
         parameters=[
             moveit_config,

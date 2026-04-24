@@ -17,6 +17,7 @@ find_package(rviz_visual_tools REQUIRED)
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
 add_executable(pickplace_node src/pickplace_node.cpp)
+add_executable(pickplace_demo_node src/pickplace_demo_node.cpp)
 add_executable(move_group_interface_demo src/move_group_interface_demo.cpp)
 add_executable(pickplace_node_mgi src/pickplace_node_mgi.cpp)
 add_executable(planning_scene_api_demo src/moveit_api_demo/planning_scene_api_demo.cpp)
@@ -90,6 +91,13 @@ ament_target_dependencies(
 )
 
 ament_target_dependencies(
+  pickplace_demo_node
+  "moveit_task_constructor_core"
+  "rclcpp"
+)
+
+
+ament_target_dependencies(
   mtc_node
   "moveit_task_constructor_core"
   "rclcpp"
@@ -99,6 +107,7 @@ install(TARGETS
   move_to_pose
   mtc_node
   pickplace_node
+  pickplace_demo_node
   move_group_interface_demo
   pickplace_node_mgi
   planning_scene_api_demo

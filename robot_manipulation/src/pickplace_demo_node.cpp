@@ -356,7 +356,7 @@ int main(int argc, char** argv)
         executor.remove_node(mtc_task_node->getNodeBaseInterface());
     });
 
-    //mtc_task_node->setupPlanningScene();
+    mtc_task_node->setupPlanningScene();
 
     mtc_task_node->doTask();
 
