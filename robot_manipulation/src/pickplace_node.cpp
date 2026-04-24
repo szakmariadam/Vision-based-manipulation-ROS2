@@ -329,6 +329,12 @@ mtc::Task MTCTaskNode::createTask()
 
         task.add(std::move(place));
     }
+
+    {
+        auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("remove object");
+        stage->removeObject("bottle");
+        task.add(std::move(stage));
+    }
     
     {
         auto stage = std::make_unique<mtc::stages::MoveTo>("return home", sampling_planner);
