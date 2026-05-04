@@ -27,7 +27,12 @@ for r in results:
 	cv2.circle(image_color, (cX, cY), 5, (0, 0, 255), -1)
 	# draw the tag family on the image
 	tagFamily = r.tag_family.decode("utf-8")
-	cv2.putText(image_color, tagFamily, (ptA[0], ptA[1] - 15),
+	tag_id = "ID: " + str(r.tag_id)
+
+	cv2.putText(image_color, tagFamily, (ptA[0], ptA[1] - 50),
+		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+	
+	cv2.putText(image_color, tag_id, (ptA[0], ptA[1] - 35),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
 print(results)
