@@ -7,7 +7,7 @@ image_path = "camera_vision_py/calib_images/workspace.png"
 tagFamily = "tagStandard41h12"
 
 tagsize = 0.05
-square_size = tagsize# - 2*(tagsize/9)
+square_size = (tagsize/9)*5
 tag_id = 0
 
 tagCorners = np.array([
