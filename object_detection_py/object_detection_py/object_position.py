@@ -17,17 +17,17 @@ class ObjectPosition(Node):
 
         self.bridge = CvBridge()
 
-        self.bb_pos_subscription = Subscriber(
-            self,
+        self.bb_pos_subscription = self.create_subscription(
             Float32MultiArray,
             "/object_detection/bb_positions",
+            self.bb_pos_subscription_callback,
             5,
         )
 
-        self.classes_subscription = Subscriber(
-            self,
+        self.classes_subscription = self.create_subscription(
             String,
             "/object_detection/classes",
+            self.classes_subscription_callback,
             5
         )
 
@@ -37,14 +37,7 @@ class ObjectPosition(Node):
             5
         )
 
-        self.sync = ApproximateTimeSynchronizer(
-            [self.bb_pos_subscription, self.classes_subscription],
-            queue_size=10,
-            slop=0.01,  # time tolerance (seconds)
-            allow_headerless=True
-        )
-
-        self.sync.registerCallback(self.synced_callback)
+        self.timer = self.create_timer(0.05, self.timer_callback)
 
         #get projection matrix
         intrinsics_path = os.path.join(
@@ -59,11 +52,18 @@ class ObjectPosition(Node):
         self.transform_buffer = Buffer()
         self.transform_listener = TransformListener(self.transform_buffer, self)
 
+        self.classes_array = []
+        self.bb_pos_array = []
+
         self.get_logger().info("Object position node started.")
 
-    def synced_callback(self, bb_pos, classes):
-        classes_array = ast.literal_eval(classes.data)
-        bb_pos_array = bb_pos.data
+    def classes_subscription_callback(self, msg):
+        self.classes_array = ast.literal_eval(msg.data)
+
+    def bb_pos_subscription_callback(self, msg):
+        self.bb_pos_array = msg.data
+
+    def timer_callback(self):
         try:
             camera_pose_quat = self.transform_buffer.lookup_transform("workspace_link", "camera_link_optical", rclpy.time.Time())
             camera_pose_quat_r = camera_pose_quat.transform.rotation
@@ -79,16 +79,16 @@ class ObjectPosition(Node):
 
         object_positions = []
 
-        for i in range(0, len(classes_array)):
-            bb_pos_array_i = np.array([])
+        for i in range(0, len(self.classes_array)):
+            self.bb_pos_array_i = np.array([])
             for j in range(0, 4):
-                np.append(bb_pos_array_i, bb_pos_array[i*4+j])
+                np.append(self.bb_pos_array_i, self.bb_pos_array[i*4+j])
 
-            #self.get_logger().info(f'{classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
+            #self.get_logger().info(f'{self.classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
 
             #get bottom center in image
-            center_img = [int(bb_pos_array[0]+(bb_pos_array[2]-bb_pos_array[0])/2), int(bb_pos_array[3])]
-            #self.get_logger().info(f'{classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
+            center_img = [int(self.bb_pos_array[0]+(self.bb_pos_array[2]-self.bb_pos_array[0])/2), int(self.bb_pos_array[3])]
+            #self.get_logger().info(f'{self.classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
             
             pts = np.array([[[center_img[0], center_img[1]]]], dtype=np.float32)
             undistorted = cv2.undistortPoints(pts, self.K, self.dist) #undistort points
@@ -103,10 +103,10 @@ class ObjectPosition(Node):
             
             #get object center from object side
             #Only works from this angle!
-            if classes_array[i] == 'bottle':
+            if self.classes_array[i] == 'bottle':
                 obj_pos[1] = obj_pos[1] + 0.03 
 
-            #self.get_logger().info(f'{classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
+            #self.get_logger().info(f'{self.classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
             for pos in obj_pos: object_positions.append(pos)
 
         self.obj_pos_publisher.publish(Float32MultiArray(data=object_positions))

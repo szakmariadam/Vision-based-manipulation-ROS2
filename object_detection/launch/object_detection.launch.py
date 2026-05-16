@@ -1,4 +1,5 @@
 from launch import LaunchDescription
+from launch.actions import TimerAction
 from launch_ros.actions import Node
 from moveit_configs_utils import MoveItConfigsBuilder
 
@@ -26,4 +27,9 @@ def generate_launch_description():
         output="screen",
     )
 
-    return LaunchDescription([detect_object, object_position, planning_scene_updater])
+    planning_scene_updater_start = TimerAction(
+        period=3.0,
+        actions=[planning_scene_updater]
+    )
+
+    return LaunchDescription([detect_object, object_position, planning_scene_updater_start])
