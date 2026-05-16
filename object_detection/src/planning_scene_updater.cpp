@@ -42,6 +42,12 @@ public:
             std::bind(&PlanningSceneUpdater::obj_pos_callback, this, _1)
         );
 
+        obj_manip_subscription_ = this->create_subscription<std_msgs::msg::String>(
+            "/object_manipulation",
+            10,
+            std::bind(&PlanningSceneUpdater::obj_manip_callback, this, _1)
+        );
+
         planning_scene_diff_publisher = this->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", 1);
         while (planning_scene_diff_publisher->get_subscription_count() < 1)
         {
@@ -93,8 +99,14 @@ private:
         obj_pos_ = msg;
     }
 
+    void obj_manip_callback(const std_msgs::msg::String::SharedPtr msg)
+    {
+        run = false;
+    }
+
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr classes_subscription_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr obj_pos_subscription_;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr obj_manip_subscription_;
 
     std_msgs::msg::Float32MultiArray::SharedPtr obj_pos_;
 
@@ -111,9 +123,11 @@ private:
 
     std::vector<std::string> classes;
 
+    bool run = true;
+
     void process()
     {
-        if (/*!classes.empty() &&*/ obj_pos_)
+        if (/*!classes.empty() &&*/ obj_pos_ && run)
         {
             //RCLCPP_INFO(this->get_logger(), "classes size: %i", classes.size());
             for (int i=0; i<classes.size(); i++)
@@ -149,10 +163,6 @@ private:
 
                 }
             }
-        }
-        else
-        {
-            RCLCPP_WARN(this->get_logger(), "Waiting for both messages...");
         }
     }
 };
