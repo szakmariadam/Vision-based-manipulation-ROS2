@@ -67,7 +67,8 @@ class DetectObject(Node):
             #cv2.waitKey(1)
 
         except Exception as e:
-            self.get_logger().error(f"Failed to process image: {e}")
+            pass
+            #self.get_logger().error(f"Failed to process image: {e}")
         
 
     def image_callback(self, msg):

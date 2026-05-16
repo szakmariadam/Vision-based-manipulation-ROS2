@@ -70,7 +70,7 @@ class ObjectPosition(Node):
             camera_pose_t = camera_pose_quat.transform.translation
             #self.get_logger().info(f'{camera_pose_t.x}, {camera_pose_t.y}, {camera_pose_t.z}')
         except Exception as e:
-            self.get_logger().error(str(e))
+            #self.get_logger().error(str(e))
             return
 
         r = Rotation.from_quat([camera_pose_quat_r.x, camera_pose_quat_r.y, camera_pose_quat_r.z, camera_pose_quat_r.w]).as_euler('xyz')
