@@ -4,7 +4,7 @@ from moveit_configs_utils.launches import generate_move_group_launch
 
 def generate_launch_description():
     moveit_config = (
-        MoveItConfigsBuilder("ur", package_name="ur_moveit_config")
+        MoveItConfigsBuilder("ur", package_name="ur_moveit_config_custom")
         .planning_pipelines(pipelines=["ompl"])
         .to_moveit_configs()
     )

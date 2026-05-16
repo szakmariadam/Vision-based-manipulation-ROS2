@@ -164,7 +164,7 @@ mtc::Task MTCTaskNode::createTask()
             stage->properties().set("marker_ns", "grasp_pose");
             stage->setPreGraspPose("Open");
             stage->setObject("bottle");
-            stage->setAngleDelta(M_PI / 6);
+            stage->setAngleDelta(M_PI / 2);
             stage->setMonitoredStage(current_state_ptr);  // Hook into current state
 
             stage->setEndEffector("gripper");

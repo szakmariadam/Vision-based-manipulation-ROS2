@@ -168,13 +168,13 @@ def launch_setup(context, *args, **kwargs):
 
     move_group_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("ur_moveit_config"), "/launch/move_group.launch.py"]
+            [FindPackageShare("ur_moveit_config_custom"), "/launch/move_group.launch.py"]
         ),
     )
 
     moveit_rviz_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("ur_moveit_config"), "/launch/moveit_rviz.launch.py"]
+            [FindPackageShare("ur_moveit_config_custom"), "/launch/moveit_rviz.launch.py"]
         ),
     )
 
