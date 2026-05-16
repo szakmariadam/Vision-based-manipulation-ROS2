@@ -13,6 +13,7 @@ find_package(moveit_task_constructor_core REQUIRED)
 find_package(graph_msgs REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
 find_package(rviz_visual_tools REQUIRED)
+find_package(std_msgs REQUIRED)
 
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(mtc_node src/mtc_node.cpp)
@@ -88,6 +89,7 @@ ament_target_dependencies(
   pickplace_node
   "moveit_task_constructor_core"
   "rclcpp"
+  "std_msgs"
 )
 
 ament_target_dependencies(

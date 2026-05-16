@@ -1,4 +1,5 @@
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <moveit/planning_scene/planning_scene.hpp>
 #include <moveit/planning_scene_interface/planning_scene_interface.hpp>
 #include <moveit/task_constructor/task.h>
@@ -30,12 +31,23 @@ public:
     void setupPlanningScene();
 
 private:
+    void topicCallback(const std_msgs::msg::String::SharedPtr msg);
+
     mtc::Task createTask();
     mtc::Task task_;
     rclcpp::Node::SharedPtr node_;
+
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
 };
 
-MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions& options) : node_{ std::make_shared<rclcpp::Node>("pickplace_node", options)}{}
+MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions& options) : node_{ std::make_shared<rclcpp::Node>("pickplace_node", options)}
+{
+    sub_ = node_->create_subscription<std_msgs::msg::String>(
+        "object_manipulation",
+        10,
+        std::bind(&MTCTaskNode::topicCallback, this, std::placeholders::_1)
+    );
+}
 
 rclcpp::node_interfaces::NodeBaseInterface::SharedPtr MTCTaskNode::getNodeBaseInterface()
 {
@@ -346,6 +358,15 @@ mtc::Task MTCTaskNode::createTask()
     return task;
 }
 
+void MTCTaskNode::topicCallback(const std_msgs::msg::String::SharedPtr msg)
+{
+    RCLCPP_INFO(node_->get_logger(),
+                "Received: %s",
+                msg->data.c_str());
+
+    doTask();
+}
+
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
@@ -364,7 +385,7 @@ int main(int argc, char** argv)
 
     //mtc_task_node->setupPlanningScene();
 
-    mtc_task_node->doTask();
+    //mtc_task_node->doTask();
 
     spin_thread->join();
     rclcpp::shutdown();

@@ -19,10 +19,16 @@ def generate_launch_description():
         ),
     )
 
+    pickplace_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("robot_manipulation"), "/launch/pick_place.launch.py"]
+        ),
+    )
+
     object_detection_start = TimerAction(
         period=5.0,
         actions=[object_detection]
     )
 
 
-    return LaunchDescription([workspace_moveit, object_detection_start])
+    return LaunchDescription([workspace_moveit, object_detection_start, pickplace_node])
