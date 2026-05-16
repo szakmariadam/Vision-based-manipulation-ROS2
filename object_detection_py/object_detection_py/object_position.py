@@ -80,14 +80,10 @@ class ObjectPosition(Node):
         object_positions = []
 
         for i in range(0, len(self.classes_array)):
-            self.bb_pos_array_i = np.array([])
-            for j in range(0, 4):
-                np.append(self.bb_pos_array_i, self.bb_pos_array[i*4+j])
-
-            #self.get_logger().info(f'{self.classes_array[i]} bb pos: [{x1}, {y1}, {x2}, {y2}]')
+            #self.get_logger().info(f'{self.classes_array[i]} bb pos: [{self.bb_pos_array[i*4+0]}, {self.bb_pos_array[i*4+1]}, {self.bb_pos_array[i*4+2]}, {self.bb_pos_array[i*4+3]}]')
 
             #get bottom center in image
-            center_img = [int(self.bb_pos_array[0]+(self.bb_pos_array[2]-self.bb_pos_array[0])/2), int(self.bb_pos_array[3])]
+            center_img = [int(self.bb_pos_array[i*4+0]+(self.bb_pos_array[i*4+2]-self.bb_pos_array[i*4+0])/2), int(self.bb_pos_array[i*4+3])]
             #self.get_logger().info(f'{self.classes_array[i]} center: [{center_img[0]}, {center_img[1]}]')
             
             pts = np.array([[[center_img[0], center_img[1]]]], dtype=np.float32)
