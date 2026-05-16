@@ -28,7 +28,7 @@ def generate_launch_description():
     )
 
     planning_scene_updater_start = TimerAction(
-        period=3.0,
+        period=5.0,
         actions=[planning_scene_updater]
     )
 
