@@ -38,6 +38,7 @@ private:
     rclcpp::Node::SharedPtr node_;
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_;
 };
 
 MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions& options) : node_{ std::make_shared<rclcpp::Node>("pickplace_node", options)}
@@ -46,6 +47,11 @@ MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions& options) : node_{ std::make_
         "object_manipulation",
         10,
         std::bind(&MTCTaskNode::topicCallback, this, std::placeholders::_1)
+    );
+
+    pub_ = node_->create_publisher<std_msgs::msg::String>(
+        "manipulation_status",
+        10
     );
 }
 
@@ -99,6 +105,11 @@ void MTCTaskNode::doTask()
         RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed");
         return;
     }
+
+    std_msgs::msg::String msg;
+    msg.data = "done";
+
+    pub_->publish(msg);
     
     return;
 }

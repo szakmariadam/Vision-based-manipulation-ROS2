@@ -48,6 +48,12 @@ public:
             std::bind(&PlanningSceneUpdater::obj_manip_callback, this, _1)
         );
 
+        manip_status_subscription_ = this->create_subscription<std_msgs::msg::String>(
+            "/manipulation_status",
+            10,
+            std::bind(&PlanningSceneUpdater::manip_status_callback, this, _1)
+        );
+
         planning_scene_diff_publisher = this->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", 1);
         while (planning_scene_diff_publisher->get_subscription_count() < 1)
         {
@@ -104,9 +110,15 @@ private:
         run = false;
     }
 
+    void manip_status_callback(const std_msgs::msg::String::SharedPtr msg)
+    {
+        run = true;
+    }
+
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr classes_subscription_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr obj_pos_subscription_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr obj_manip_subscription_;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr manip_status_subscription_;
 
     std_msgs::msg::Float32MultiArray::SharedPtr obj_pos_;
 
