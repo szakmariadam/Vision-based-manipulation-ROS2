@@ -247,6 +247,36 @@ mtc::Task MTCTaskNode::createTask()
                 wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
                 grasp->insert(std::move(wrapper));
             }
+            if(object_name == "sports ball")
+            {
+                // Sample grasp pose
+                auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
+                stage->properties().configureInitFrom(mtc::Stage::PARENT);
+                stage->properties().set("marker_ns", "grasp_pose");
+                stage->setPreGraspPose("Open");
+                stage->setObject("sports ball");
+                stage->setAngleDelta(M_PI / 6);
+                stage->setMonitoredStage(current_state_ptr);  // Hook into current state
+
+                stage->setEndEffector("gripper");
+
+                Eigen::Isometry3d grasp_frame_transform;
+                Eigen::Quaterniond q = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX()) *
+                                        Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()) *
+                                        Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
+                grasp_frame_transform.linear() = q.matrix();
+                grasp_frame_transform.translation().z() = 0.01;
+
+                // Compute IK
+                auto wrapper =
+                    std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
+                wrapper->setMaxIKSolutions(1);
+                wrapper->setMinSolutionDistance(1.0);
+                wrapper->setIKFrame(grasp_frame_transform, hand_frame);
+                wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
+                wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
+                grasp->insert(std::move(wrapper));
+            }
 
         }
 
@@ -259,6 +289,7 @@ mtc::Task MTCTaskNode::createTask()
                                     true);
             stage->allowCollisions("bottle", "workspace_link", true);
             stage->allowCollisions("cup", "workspace_link", true);
+            stage->allowCollisions("sports ball", "workspace_link", true);
             grasp->insert(std::move(stage));
         }
 
@@ -341,6 +372,9 @@ mtc::Task MTCTaskNode::createTask()
             }
             if(object_name == "cup"){
                 target_pose_msg.pose.position.z = 0.06;
+            }
+            if(object_name == "sports ball"){
+                target_pose_msg.pose.position.z = 0.04;
             }
             target_pose_msg.pose.orientation.w = 1.0;
             stage->setPose(target_pose_msg);

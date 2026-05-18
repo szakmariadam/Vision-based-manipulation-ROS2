@@ -193,6 +193,33 @@ private:
                     planning_scene.is_diff = true;
                     planning_scene_diff_publisher->publish(planning_scene);
                 }
+                if(classes[i] == "sports ball")
+                {
+                    moveit_msgs::msg::PlanningScene planning_scene;
+                    moveit_msgs::msg::CollisionObject collision_object;
+
+                    collision_object.header.frame_id = "workspace_link";
+                    collision_object.id = "sports ball";
+
+                    primitive.type = primitive.SPHERE;
+                    primitive.dimensions.resize(1);
+                    primitive.dimensions[0] = 0.04;
+
+                    pose.position.x = obj_pos_[i*3];
+                    pose.position.y = obj_pos_[i*3 + 1];
+                    pose.position.z = 0.015;
+                    pose.orientation.w = 1.0;
+
+                    collision_object.primitives.push_back(primitive);
+                    collision_object.primitive_poses.push_back(pose);
+
+                    collision_object.operation = collision_object.ADD;
+
+                    planning_scene.world.collision_objects.clear();
+                    planning_scene.world.collision_objects.push_back(collision_object);
+                    planning_scene.is_diff = true;
+                    planning_scene_diff_publisher->publish(planning_scene);
+                }
             }
         }
     }

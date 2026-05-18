@@ -138,7 +138,7 @@
         <include>
             <name>TennisBall</name>
             <static>false</static>
-            <pose>0 -0.2 1.1 0 0 0</pose>
+            <pose>0 -0.2 1.09 0 0 0</pose>
             <uri>model://TennisBall</uri>
         </include>
 

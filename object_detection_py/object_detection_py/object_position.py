@@ -97,6 +97,9 @@ class ObjectPositions(Node):
 
             if self.classes_array[i] == 'cup':
                 obj_pos[1] = obj_pos[1] + 0.06 
+    
+            if self.classes_array[i] == 'sports ball':
+                obj_pos[1] = obj_pos[1] + 0.01 
 
             #self.get_logger().info(f'{self.classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
             class_names.append(self.classes_array[i])
