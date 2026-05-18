@@ -16,7 +16,7 @@ class KeyboardNode(Node):
 
         self.publisher_ = self.create_publisher(String, 'object_manipulation', 10)
 
-        self.get_logger().info("Object manipulation controller started")
+        self.get_logger().info("Object manipulation controller started. Press q to quit...")
         self.get_logger().info("Press 'b' for bottle")
         self.get_logger().info("Press 'c' for cup")
         self.get_logger().info("Press 't' for tennis ball")
