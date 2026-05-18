@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 add_executable(planning_scene_updater src/planning_scene_updater.cpp)
 
@@ -17,6 +18,11 @@ ament_target_dependencies(planning_scene_updater
   rclcpp
   std_msgs
   moveit_ros_planning_interface
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/ObjectDetection.msg"
+  DEPENDENCIES std_msgs
 )
 
 install(TARGETS
