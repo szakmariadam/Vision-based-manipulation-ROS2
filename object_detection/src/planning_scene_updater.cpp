@@ -73,7 +73,6 @@ private:
     {
         obj_pos_ = msg->obj_positions.data;
         
-        RCLCPP_INFO(this->get_logger(), "%s", msg->classes.data.c_str());
 
         std::string s;
         s = msg->classes.data.c_str();
@@ -151,11 +150,10 @@ private:
                     primitive.dimensions[0] = 0.18;
                     primitive.dimensions[1] = 0.03;
 
-                    pose.position.x = obj_pos_[i*4];
-                    pose.position.y = obj_pos_[i*4 + 1];
+                    pose.position.x = obj_pos_[i*3];
+                    pose.position.y = obj_pos_[i*3 + 1];
                     pose.position.z = 0.09;
                     pose.orientation.w = 1.0;
-
 
                     collision_object.primitives.push_back(primitive);
                     collision_object.primitive_poses.push_back(pose);
@@ -166,9 +164,7 @@ private:
                     planning_scene.world.collision_objects.push_back(collision_object);
                     planning_scene.is_diff = true;
                     planning_scene_diff_publisher->publish(planning_scene);
-
                 }
-
                 if(classes[i] == "cup")
                 {
                     moveit_msgs::msg::PlanningScene planning_scene;
@@ -182,11 +178,10 @@ private:
                     primitive.dimensions[0] = 0.12;
                     primitive.dimensions[1] = 0.04;
 
-                    pose.position.x = obj_pos_[i*4];
-                    pose.position.y = obj_pos_[i*4 + 1];
+                    pose.position.x = obj_pos_[i*3];
+                    pose.position.y = obj_pos_[i*3 + 1];
                     pose.position.z = 0.06;
                     pose.orientation.w = 1.0;
-
 
                     collision_object.primitives.push_back(primitive);
                     collision_object.primitive_poses.push_back(pose);
@@ -197,7 +192,6 @@ private:
                     planning_scene.world.collision_objects.push_back(collision_object);
                     planning_scene.is_diff = true;
                     planning_scene_diff_publisher->publish(planning_scene);
-
                 }
             }
         }
