@@ -1,6 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
+#include "object_detection/msg/object_position.hpp"
 
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -30,14 +31,8 @@ public:
     PlanningSceneUpdater()
         : Node("planning_scene_updater")
     {
-        classes_subscription_ = this->create_subscription<std_msgs::msg::String>(
-            "/object_detection/classes",
-            10,
-            std::bind(&PlanningSceneUpdater::classes_callback, this, _1)
-        );
-
-        obj_pos_subscription_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(
-            "/object_detection/obj_positions",
+        obj_pos_subscription_ = this->create_subscription<object_detection::msg::ObjectPosition>(
+            "/object_position",
             10,
             std::bind(&PlanningSceneUpdater::obj_pos_callback, this, _1)
         );
@@ -71,12 +66,18 @@ public:
         kinematic_model_ = robot_model_loader_->getModel();
 
         RCLCPP_INFO(this->get_logger(), "Model frame: %s", kinematic_model_->getModelFrame().c_str());
+
     }
 private:
-    void classes_callback(const std_msgs::msg::String::SharedPtr msg)
+    void obj_pos_callback(const object_detection::msg::ObjectPosition::SharedPtr msg)
     {
+        obj_pos_ = msg->obj_positions.data;
+        
+        RCLCPP_INFO(this->get_logger(), "%s", msg->classes.data.c_str());
+
         std::string s;
-        s = msg->data;
+        s = msg->classes.data.c_str();
+
 
         // Remove brackets
         s.erase(std::remove(s.begin(), s.end(), '['), s.end());
@@ -97,12 +98,6 @@ private:
                 classes.push_back(item);
             }
         }
-
-    }
-
-    void obj_pos_callback(const std_msgs::msg::Float32MultiArray::SharedPtr msg)
-    {
-        obj_pos_ = msg;
     }
 
     void obj_manip_callback(const std_msgs::msg::String::SharedPtr msg)
@@ -115,12 +110,11 @@ private:
         run = true;
     }
 
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr classes_subscription_;
-    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr obj_pos_subscription_;
+    rclcpp::Subscription<object_detection::msg::ObjectPosition>::SharedPtr obj_pos_subscription_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr obj_manip_subscription_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr manip_status_subscription_;
 
-    std_msgs::msg::Float32MultiArray::SharedPtr obj_pos_;
+    std::vector<float> obj_pos_;
 
     rclcpp::TimerBase::SharedPtr timer_;
 
@@ -139,7 +133,7 @@ private:
 
     void process()
     {
-        if (/*!classes.empty() &&*/ obj_pos_ && run)
+        if (!classes.empty() && run)
         {
             //RCLCPP_INFO(this->get_logger(), "classes size: %i", classes.size());
             for (int i=0; i<classes.size(); i++)
@@ -157,8 +151,8 @@ private:
                     primitive.dimensions[0] = 0.18;
                     primitive.dimensions[1] = 0.03;
 
-                    pose.position.x = obj_pos_->data[i*4];
-                    pose.position.y = obj_pos_->data[i*4 + 1];
+                    pose.position.x = obj_pos_[i*4];
+                    pose.position.y = obj_pos_[i*4 + 1];
                     pose.position.z = 0.09;
                     pose.orientation.w = 1.0;
 
@@ -188,8 +182,8 @@ private:
                     primitive.dimensions[0] = 0.12;
                     primitive.dimensions[1] = 0.04;
 
-                    pose.position.x = obj_pos_->data[i*4];
-                    pose.position.y = obj_pos_->data[i*4 + 1];
+                    pose.position.x = obj_pos_[i*4];
+                    pose.position.y = obj_pos_[i*4 + 1];
                     pose.position.z = 0.06;
                     pose.orientation.w = 1.0;
 

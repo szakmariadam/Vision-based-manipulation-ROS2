@@ -26,6 +26,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs
 )
 
+rosidl_target_interfaces(planning_scene_updater
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
 install(TARGETS
   planning_scene_updater
   DESTINATION lib/${PROJECT_NAME}
@@ -47,5 +50,7 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}
 )
+
+ament_export_dependencies(rosidl_default_runtime)
 
 ament_package()
