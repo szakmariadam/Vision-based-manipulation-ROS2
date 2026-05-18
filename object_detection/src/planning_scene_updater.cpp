@@ -176,7 +176,7 @@ private:
                     primitive.type = primitive.CYLINDER;
                     primitive.dimensions.resize(2);
                     primitive.dimensions[0] = 0.12;
-                    primitive.dimensions[1] = 0.04;
+                    primitive.dimensions[1] = 0.05;
 
                     pose.position.x = obj_pos_[i*3];
                     pose.position.y = obj_pos_[i*3 + 1];

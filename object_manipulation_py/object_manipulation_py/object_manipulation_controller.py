@@ -18,6 +18,7 @@ class KeyboardNode(Node):
 
         self.get_logger().info("Object manipulation controller started")
         self.get_logger().info("Press 'b' for bottle")
+        self.get_logger().info("Press 'c' for cup")
 
     def get_key(self):
 
@@ -41,6 +42,11 @@ class KeyboardNode(Node):
             if key == 'b':
                 self.get_logger().info("Getting bottle...")
                 msg.data = "bottle"
+                self.publisher_.publish(msg)
+
+            elif key == 'c':
+                self.get_logger().info("Getting cup...")
+                msg.data = "cup"
                 self.publisher_.publish(msg)
 
             elif key == 'q':

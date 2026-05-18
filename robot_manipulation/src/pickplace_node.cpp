@@ -16,6 +16,8 @@
 #include <tf2_eigen/tf2_eigen.h>
 #endif
 
+#include <string>
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("pickplace_node");
 namespace mtc = moveit::task_constructor;
 
@@ -39,6 +41,8 @@ private:
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_;
+
+    std::string object_name;
 };
 
 MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions& options) : node_{ std::make_shared<rclcpp::Node>("pickplace_node", options)}
@@ -80,6 +84,8 @@ void MTCTaskNode::setupPlanningScene()
 
 void MTCTaskNode::doTask()
 {
+    RCLCPP_INFO(LOGGER, "object: %s", object_name.c_str());
+
     task_ = createTask();
 
     try
@@ -181,43 +187,78 @@ mtc::Task MTCTaskNode::createTask()
         }
 
         {
-            // Sample grasp pose
-            auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
-            stage->properties().configureInitFrom(mtc::Stage::PARENT);
-            stage->properties().set("marker_ns", "grasp_pose");
-            stage->setPreGraspPose("Open");
-            stage->setObject("bottle");
-            stage->setAngleDelta(M_PI / 6);
-            stage->setMonitoredStage(current_state_ptr);  // Hook into current state
+            if(object_name == "bottle")
+            {
+                // Sample grasp pose
+                auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
+                stage->properties().configureInitFrom(mtc::Stage::PARENT);
+                stage->properties().set("marker_ns", "grasp_pose");
+                stage->setPreGraspPose("Open");
+                stage->setObject("bottle");
+                stage->setAngleDelta(M_PI / 6);
+                stage->setMonitoredStage(current_state_ptr);  // Hook into current state
 
-            stage->setEndEffector("gripper");
+                stage->setEndEffector("gripper");
 
-            Eigen::Isometry3d grasp_frame_transform;
-            Eigen::Quaterniond q = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX()) *
-                                    Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()) *
-                                    Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
-            grasp_frame_transform.linear() = q.matrix();
-            grasp_frame_transform.translation().z() = 0.0;
+                Eigen::Isometry3d grasp_frame_transform;
+                Eigen::Quaterniond q = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX()) *
+                                        Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()) *
+                                        Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
+                grasp_frame_transform.linear() = q.matrix();
+                grasp_frame_transform.translation().z() = 0.0;
 
-            // Compute IK
-            auto wrapper =
-                std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
-            wrapper->setMaxIKSolutions(1);
-            wrapper->setMinSolutionDistance(1.0);
-            wrapper->setIKFrame(grasp_frame_transform, hand_frame);
-            wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
-            wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
-            grasp->insert(std::move(wrapper));
+                // Compute IK
+                auto wrapper =
+                    std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
+                wrapper->setMaxIKSolutions(1);
+                wrapper->setMinSolutionDistance(1.0);
+                wrapper->setIKFrame(grasp_frame_transform, hand_frame);
+                wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
+                wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
+                grasp->insert(std::move(wrapper));
+            }
+            if(object_name == "cup")
+            {
+                // Sample grasp pose
+                auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
+                stage->properties().configureInitFrom(mtc::Stage::PARENT);
+                stage->properties().set("marker_ns", "grasp_pose");
+                stage->setPreGraspPose("Open");
+                stage->setObject("cup");
+                stage->setAngleDelta(M_PI / 6);
+                stage->setMonitoredStage(current_state_ptr);  // Hook into current state
+
+                stage->setEndEffector("gripper");
+
+                Eigen::Isometry3d grasp_frame_transform;
+                Eigen::Quaterniond q = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX()) *
+                                        Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()) *
+                                        Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
+                grasp_frame_transform.linear() = q.matrix();
+                grasp_frame_transform.translation().z() = 0.0;
+
+                // Compute IK
+                auto wrapper =
+                    std::make_unique<mtc::stages::ComputeIK>("grasp pose IK", std::move(stage));
+                wrapper->setMaxIKSolutions(1);
+                wrapper->setMinSolutionDistance(1.0);
+                wrapper->setIKFrame(grasp_frame_transform, hand_frame);
+                wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
+                wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
+                grasp->insert(std::move(wrapper));
+            }
+
         }
 
         {
             auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("allow collision (hand,object)");
-            stage->allowCollisions("bottle",
+            stage->allowCollisions(object_name,
                                     task.getRobotModel()
                                         ->getJointModelGroup(hand_group_name)
                                         ->getLinkModelNamesWithCollisionGeometry() ,
                                     true);
             stage->allowCollisions("bottle", "workspace_link", true);
+            stage->allowCollisions("cup", "workspace_link", true);
             grasp->insert(std::move(stage));
         }
 
@@ -230,7 +271,7 @@ mtc::Task MTCTaskNode::createTask()
 
         {
             auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("attach object");
-            stage->attachObject("bottle", hand_frame);
+            stage->attachObject(object_name, hand_frame);
             attach_object_stage = stage.get();
             grasp->insert(std::move(stage));
         }
@@ -290,12 +331,17 @@ mtc::Task MTCTaskNode::createTask()
             auto stage = std::make_unique<mtc::stages::GeneratePlacePose>("generate place pose");
             stage->properties().configureInitFrom(mtc::Stage::PARENT);
             stage->properties().set("marker_ns", "place_pose");
-            stage->setObject("bottle");
+            stage->setObject(object_name);
 
             geometry_msgs::msg::PoseStamped target_pose_msg;
             target_pose_msg.header.frame_id = "workspace_link";
-            target_pose_msg.pose.position.y = -0.5;
-            target_pose_msg.pose.position.z = 0.09;
+            target_pose_msg.pose.position.y = -0.3;
+            if(object_name == "bottle"){
+                target_pose_msg.pose.position.z = 0.09;
+            }
+            if(object_name == "cup"){
+                target_pose_msg.pose.position.z = 0.06;
+            }
             target_pose_msg.pose.orientation.w = 1.0;
             stage->setPose(target_pose_msg);
             stage->setMonitoredStage(attach_object_stage);  // Hook into attach_object_stage
@@ -305,7 +351,7 @@ mtc::Task MTCTaskNode::createTask()
                 std::make_unique<mtc::stages::ComputeIK>("place pose IK", std::move(stage));
             wrapper->setMaxIKSolutions(1);
             wrapper->setMinSolutionDistance(1.0);
-            wrapper->setIKFrame("bottle");
+            wrapper->setIKFrame(object_name);
             wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
             wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
             place->insert(std::move(wrapper));
@@ -320,7 +366,7 @@ mtc::Task MTCTaskNode::createTask()
 
         {
             auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("forbid collision (hand,object)");
-            stage->allowCollisions("bottle",
+            stage->allowCollisions(object_name,
                                     task.getRobotModel()
                                         ->getJointModelGroup(hand_group_name)
                                         ->getLinkModelNamesWithCollisionGeometry(),
@@ -330,7 +376,7 @@ mtc::Task MTCTaskNode::createTask()
 
         {
             auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("detach object");
-            stage->detachObject("bottle", hand_frame);
+            stage->detachObject(object_name, hand_frame);
             place->insert(std::move(stage));
         }
 
@@ -356,6 +402,7 @@ mtc::Task MTCTaskNode::createTask()
     {
         auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("remove object");
         stage->removeObject("bottle");
+        stage->removeObject("cup");
         task.add(std::move(stage));
     }
     
@@ -371,9 +418,7 @@ mtc::Task MTCTaskNode::createTask()
 
 void MTCTaskNode::topicCallback(const std_msgs::msg::String::SharedPtr msg)
 {
-    RCLCPP_INFO(node_->get_logger(),
-                "Received: %s",
-                msg->data.c_str());
+    object_name = msg->data.c_str();
 
     doTask();
 }
