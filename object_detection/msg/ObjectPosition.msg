@@ -1,0 +1,2 @@
+std_msgs/Float32MultiArray obj_positions
+std_msgs/String classes

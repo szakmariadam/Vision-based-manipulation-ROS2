@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String, Float32MultiArray
+from object_detection.msg import ObjectDetection, ObjectPosition
 from ament_index_python import get_package_share_directory
 from cv_bridge import CvBridge
 from message_filters import Subscriber, ApproximateTimeSynchronizer
@@ -11,29 +12,22 @@ import ast
 import os
 import numpy as np
 
-class ObjectPosition(Node):
+class ObjectPositions(Node):
     def __init__(self):
         super().__init__('object_position')
 
         self.bridge = CvBridge()
 
-        self.bb_pos_subscription = self.create_subscription(
-            Float32MultiArray,
-            "/object_detection/bb_positions",
-            self.bb_pos_subscription_callback,
+        self.obj_det_sub = self.create_subscription(
+            ObjectDetection,
+            "/object_detection",
+            self.obj_det_callback,
             5,
         )
 
-        self.classes_subscription = self.create_subscription(
-            String,
-            "/object_detection/classes",
-            self.classes_subscription_callback,
-            5
-        )
-
         self.obj_pos_publisher = self.create_publisher(
-            Float32MultiArray,
-            "/object_detection/obj_positions",
+            ObjectPosition,
+            "/object_position",
             5
         )
 
@@ -57,11 +51,9 @@ class ObjectPosition(Node):
 
         self.get_logger().info("Object position node started.")
 
-    def classes_subscription_callback(self, msg):
-        self.classes_array = ast.literal_eval(msg.data)
-
-    def bb_pos_subscription_callback(self, msg):
-        self.bb_pos_array = msg.data
+    def obj_det_callback(self, msg):
+        self.bb_pos_array = msg.bb_positions.data
+        self.classes_array = ast.literal_eval(msg.classes.data)
 
     def timer_callback(self):
         try:
@@ -78,6 +70,7 @@ class ObjectPosition(Node):
         t = np.array([camera_pose_t.x, camera_pose_t.y, camera_pose_t.z])
 
         object_positions = []
+        class_names = []
 
         for i in range(0, len(self.classes_array)):
             #self.get_logger().info(f'{self.classes_array[i]} bb pos: [{self.bb_pos_array[i*4+0]}, {self.bb_pos_array[i*4+1]}, {self.bb_pos_array[i*4+2]}, {self.bb_pos_array[i*4+3]}]')
@@ -106,16 +99,20 @@ class ObjectPosition(Node):
                 obj_pos[1] = obj_pos[1] + 0.06 
 
             #self.get_logger().info(f'{self.classes_array[i]} 3d pos: [{obj_pos[0]}, {obj_pos[1]}, {obj_pos[2]}]')
+            class_names.append(self.classes_array[i])
             for pos in obj_pos: object_positions.append(pos)
 
-        self.obj_pos_publisher.publish(Float32MultiArray(data=object_positions))
+        resultMsg = ObjectPosition()
+        resultMsg.classes.data = str(class_names)
+        resultMsg.obj_positions.data = object_positions
+        self.obj_pos_publisher.publish(resultMsg)
 
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node = ObjectPosition()
+    node = ObjectPositions()
 
     try:
         rclpy.spin(node)

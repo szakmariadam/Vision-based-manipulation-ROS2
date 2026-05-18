@@ -22,6 +22,7 @@ ament_target_dependencies(planning_scene_updater
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ObjectDetection.msg"
+  "msg/ObjectPosition.msg"
   DEPENDENCIES std_msgs
 )
 
