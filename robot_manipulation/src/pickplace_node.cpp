@@ -101,6 +101,10 @@ void MTCTaskNode::doTask()
     if (!task_.plan(5))
     {
         RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
+        std_msgs::msg::String msg;
+        msg.data = "done";
+
+        pub_->publish(msg);
         return;
     }
     task_.introspection().publishSolution(*task_.solutions().front());
@@ -109,6 +113,10 @@ void MTCTaskNode::doTask()
     if (result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
     {
         RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed");
+        std_msgs::msg::String msg;
+        msg.data = "done";
+
+        pub_->publish(msg);
         return;
     }
 
@@ -255,7 +263,7 @@ mtc::Task MTCTaskNode::createTask()
                 stage->properties().set("marker_ns", "grasp_pose");
                 stage->setPreGraspPose("Open");
                 stage->setObject("sports ball");
-                stage->setAngleDelta(M_PI / 6);
+                stage->setAngleDelta(M_PI / 3);
                 stage->setMonitoredStage(current_state_ptr);  // Hook into current state
 
                 stage->setEndEffector("gripper");
@@ -366,7 +374,7 @@ mtc::Task MTCTaskNode::createTask()
 
             geometry_msgs::msg::PoseStamped target_pose_msg;
             target_pose_msg.header.frame_id = "workspace_link";
-            target_pose_msg.pose.position.y = -0.3;
+            target_pose_msg.pose.position.y = -0.4;
             if(object_name == "bottle"){
                 target_pose_msg.pose.position.z = 0.09;
             }
@@ -374,7 +382,7 @@ mtc::Task MTCTaskNode::createTask()
                 target_pose_msg.pose.position.z = 0.06;
             }
             if(object_name == "sports ball"){
-                target_pose_msg.pose.position.z = 0.04;
+                target_pose_msg.pose.position.z = 0.03;
             }
             target_pose_msg.pose.orientation.w = 1.0;
             stage->setPose(target_pose_msg);
