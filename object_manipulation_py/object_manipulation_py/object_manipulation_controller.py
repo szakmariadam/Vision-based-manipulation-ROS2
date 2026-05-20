@@ -9,10 +9,10 @@ import termios
 import tty
 
 
-class KeyboardNode(Node):
+class ObjectManipulationControllerNode(Node):
 
     def __init__(self):
-        super().__init__('keyboard_node')
+        super().__init__('object_manipulation_controller_node')
 
         self.publisher_ = self.create_publisher(String, 'object_manipulation', 10)
 
@@ -63,7 +63,7 @@ class KeyboardNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = KeyboardNode()
+    node = ObjectManipulationControllerNode()
 
     try:
         node.run()
